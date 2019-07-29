@@ -1,0 +1,6 @@
+Database ToDo
+
+Implement way to keep track of how many result are already found.
+Sort results.
+Login.
+Create algorithm to find what TablePage a given index is in.

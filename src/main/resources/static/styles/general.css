@@ -1,0 +1,161 @@
+#table_wrapper{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    height: 450px;
+    display:block;
+}
+
+#user-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    height: 450px;
+    display:block;
+}
+
+#selecteduser-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    height: 450px;
+    display:block;
+}
+
+#table-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    height: 450px;
+    display:block;
+}
+
+#activeuser-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    height: 700px;
+    display:block;
+}
+
+#activeuser1-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    height: 700px;
+    display:block;
+}
+
+#activeuser2-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    height: 400px;
+    display:block;
+}
+
+#activetable-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 50%;
+    height: 400px;
+    display:block;
+    margin-left: 25%;
+}
+
+#table-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    height: 200px;
+    display:block;
+}
+
+#tax-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    height: 700px;
+    display:block;
+}
+
+#config-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 50%;
+    height: 300px;
+    display:block;
+    margin-left: 25%;
+}
+
+#tablefilter-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 60%;
+    height: 300px;
+    display:block;
+    margin-left: 20%;
+}
+
+#tableresult-table{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    height: 500px;
+    display:block;
+}
+
+.var-table-class{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 50%;
+    height: 300px;
+    display:block;
+    margin-left: 25%;
+}
+
+#maint-but{}
+
+#maint-but #but1{
+    display:block; float:left;
+}
+
+#maint-but #but2{
+    display:block; float:left;
+}
+
+.tabContent{
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.docContent{
+    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    height: 700px;
+    display:block;
+}
+
+#hover{
+    color: red;
+}
+
+a {
+    color: navy;
+}

@@ -1,0 +1,98 @@
+Database Changelog
+
+//Spring Boot Server
+04/26/2019
+1.0.00b:
+	Created TableContainer constructors.
+	Autowired GeneralSerializer to TableContainer and TablePage.
+	Added SimpleSearchTablePage Callable.
+	Added simpleSearchTablePage method to TableContainer.
+	Added simpleSearchAllTablePage method to TableContainer.
+	Added TableThreadException.
+	Added isTablesLoading method to TableContainer.
+	Added LoadTablePage thread.
+	Added changeIndexes and reloadTable methods to TableContainer.
+
+04/22/2019
+1.1.00b:
+	Started SerialService Package.
+	Added ExceptionListeningService.
+	Added StringBuilderTools.
+	Added ConfigurationService.
+	Added ObjectFactory object.
+	Created TablePage.
+	Implemented indexes in TablePage.
+
+//Old Terminal Version
+04/18/2019	
+1.0.13b:
+	More conccurency issues fixed.
+
+04/11/2019
+1.0.12b:
+	Fix filelock waiting bug.
+
+04/09/2019
+1.0.11b:
+	Fixed index bug.
+	Added reboot and shutdown options to sessions.
+	Fixed delete row bug.
+
+03/11/2019	
+1.0.10b:
+	Added command: GET ALL ROWS FROM TABLE SORTBY fieldname tablename
+	Added command: QUERY ROWS FROM TABLE SORTBY fieldname tableName Field:Value,Field:Value,n
+	Added command: QUERY CONTAINS FROM TABLE SORTBY fieldname tablename field1:value1,fieldn:valuen.
+03/10/2019
+1.0.09b:
+	Added command: QUERY CONTAINS FROM TABLE tablename field1:value1,fieldn:valuen
+03/05/2019
+1.0.08b:
+	Fixed bug preventing rows in cache from reflection changes made to them while they were in the cache.
+	Fixed indexing.
+	Added table joins.
+02/25/2019
+1.0.07b:
+	Added selective indexing.
+01/20/2019
+1.0.06b:
+    Fixed cache search bug.
+    Added
+01/15/2019
+1.0.05b:
+	Added GET ALL ROWS FROM TABLE command.
+	Fixed row count.
+	Elimanated excessive threads.
+	Added network console features.
+12/30/2018
+1.0.04b:
+	Implemented threadpools.
+
+12/11/2018
+1.0.03b:
+	Fixed bug that occurs when query returns no results.
+
+12/10/2018
+1.0.02b:
+	Fixed bug that prevented comannds with white space from working.
+	Fixed transactions bug.
+	Fixed bug from multifield querys.
+
+1.0.001B:
+	Added smart cache.
+	TableContainer v1.0.01b:
+		Added List<Row> cache.
+		Added QueryCache thread.
+		QueryRowFromMultiField searches cahe first and breaks if at least one match is found.
+		Added refrence this to Table constructors.	
+		Added AddToCache Thread.
+		Added cachIndex list to stor the indexes of rows currently in cache.
+		Added CleanCache thread.
+		Added GetTableIndex thread.	
+	Table v1.0.01b:
+		Added TableContainer var Container.
+		Added TableContainer argument to all constructors.
+	CacheWather v1.0.00b:
+		Thread to check cache size and dump it when it is too big.
+
+TODO implement mechanism to control cache

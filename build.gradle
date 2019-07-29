@@ -1,0 +1,94 @@
+buildscript {
+	ext {
+		springBootVersion = '2.1.1.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+		maven { 
+			url "https://repo.spring.io/snapshot" 
+		}
+		maven { 
+			url "https://repo.spring.io/milestone" 
+		}
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+		flatDir {
+			dirs "$rootProject.projectDir/libs"
+		}
+	}
+	dependencies {
+		classpath 'org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}'
+		classpath "io.freefair.gradle:lombok-plugin:3.6.6"
+	}
+}
+
+
+
+plugins {
+	id 'org.springframework.boot' version '2.1.1.RELEASE'
+	id 'java'
+}
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: "io.freefair.lombok"
+
+group = 'com.kirchnersolutions'
+version = '1.0.14a'
+sourceCompatibility = '1.8'
+
+if (!hasProperty('mainClass')) {
+	ext.mainClass = 'com.kirchnersolutions.database.DatabaseApplication'
+}
+
+repositories {
+	flatDir {
+		dirs "$rootProject.projectDir/libs"
+	}
+	mavenCentral()
+}
+ext {
+	set('springBootAdminVersion', '1.5.7')
+}
+
+dependencies {
+	compile fileTree(dir: 'libs', include: ['*.jar'])
+	compile name: 'commons-codec-1.11'
+	// https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl
+	compile group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.9.13'
+
+	//compile "org.codehaus.jackson:jackson-all:1.9.13"
+	//compile 'org.springframework.boot:spring-boot-actuator-docs'
+	//compile 'org.springframework.boot:spring-boot-starter-actuator'
+	//compile 'org.springframework.boot:spring-boot-starter-integration'
+	//compile 'org.springframework.boot:spring-boot-starter-mail'
+	//compile 'org.springframework.boot:spring-boot-starter-mobile'
+	//compile 'org.springframework.boot:spring-boot-starter-security'
+	compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	compile 'org.springframework.boot:spring-boot-starter-web'
+	compile 'org.springframework.boot:spring-boot-starter-web-services'
+	compile 'org.springframework.boot:spring-boot-starter-websocket'
+	//compile 'de.codecentric:spring-boot-admin-starter-server'
+	testCompile 'org.springframework.boot:spring-boot-starter-test'
+	//testCompile 'org.springframework.security:spring-security-test'
+	implementation 'com.github.oshi:oshi-dist:3.13.3'
+	//compile name: 'jna-5.3.1'
+	//compile name: 'slf4j-simple-1.7.26'
+	compile("net.java.dev.jna:jna:5.3.1")
+	compile("net.java.dev.jna:jna-platform:5.3.1")
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "de.codecentric:spring-boot-admin-dependencies:${springBootAdminVersion}"
+	}
+}
+
+jar {
+	manifest {
+		attributes(
+				'Main-Class': 'com.kirchnersolutions.database.DatabaseApplication'
+		)
+	}
+}

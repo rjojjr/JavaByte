@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>JavaByte Maintenance Console</title>
+    <meta charset="UTF-8">
+    <link type="text/css" th:href="@{/styles/layout.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/general.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/tabs.css}" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="../static/scripts/html5shiv.js"></script><![endif]-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <script  th:src="@{/scripts/sockjs.js}"></script>
+    <script  th:src="@{/scripts/stomp.js}"></script>
+    <script  th:src="@{/scripts/tabs.js}"></script>
+    <script  th:src="@{/scripts/StompMaint.js}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var visited = /*[[${user.username}]]*/ '0';
+
+        /*]]>*/
+        setUname(visited);
+    </script>
+</head>
+<body onload="init()" onclick="checkStatus()">
+
+<div class="wrapper row1">
+    <header id="header" class="clear">
+        <h1>JavaByte Maintenance Console</h1>
+        <p th:object="${user}" th:text="*{msg}" style="color:red; text-align: center;"><b></b></p>
+    </header>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row2">
+    <div id="container" class="clear">
+        <div id="col1">
+            <h2>Logged in as</h2>
+            <p th:object="${user}" th:text="*{username}" style="color:red; text-align: center;"><b></b></p>
+            <a href="/logout">Logoff</a>
+            <hr>
+        </div>
+        <div id="col2">
+            <ul id="tabs">
+                <li><a href="#status">System Status</a></li>
+                <li><a href="#tables">Table Stats</a></li>
+                <li><a href="#changelog">Changelog</a></li>
+                <li><a href="#documents">Documentation</a></li>
+                <li><a href="#config">System Configuration</a></li>
+                <li><a href="#soc">Socket Server Status</a></li>
+            </ul>
+            <div class="tabContent" id="status">
+                <h2>System Status</h2>
+                <div id="status-container">
+                    <div id="user-table">
+                        <table id="system"
+                               style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <tbody>
+                            <tr>
+                                <th>
+                                    <p><b>Stat</b></p>
+                                </th>
+                                <th>
+                                    <p><b>Value</b></p>
+                                </th>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <br>
+                <hr>
+                <h3><b>Ping</b></h3>
+                <p id="ping">Ping = 0 milliseconds</p>
+                <button style="margin: 0 auto;" type="button" onclick="pingInit()">New Ping Request</button>
+                <br>
+                <hr>
+                <h3><b>CPU Bench</b></h3>
+                <p id="benchStatus"></p>
+                <p id="benchResult"></p>
+                <p>
+                    <button style="margin: 0 auto;" type="button" onclick="benchRequest()">Run CPU Bench</button>
+                    <button style="margin: 0 auto;" type="button" onclick="stopBench()">Stop CPU Bench</button>
+                </p>
+                <br>
+                <hr>
+                <div id="maint-but">
+                    <button id="but1" style="margin: 0 auto;" type="button" onclick="reboot()">Reboot Application Server</button>
+                    <button id="but2" style="margin: 0 auto;" type="button" onclick="shutdown()">Shutdown Application Server</button>
+                </div>
+
+            </div>
+            <div class="tabContent" id="tables">
+                <div id="tables-conatiner">
+                    <h2>Table Stats</h2>
+                    <div id="activeuser1-table">
+                        <table id="table"
+                               style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <tbody>
+                            <tr>
+                                <th>
+                                    <p><b>Stat</b></p>
+                                </th>
+                                <th>
+                                    <p><b>Value</b></p>
+                                </th>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="center-wrap" style="text-align: center">
+                        <div style="display: inline-block">
+                            <button style="margin: 0 auto;" type="button" onclick="tableRefresh()">Refresh</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tabContent" id="changelog">
+                <div id="changelog-conatiner">
+                    <h2>Change Log</h2>
+                    <p class="docContent" id="changeOut"></p>
+                </div>
+            </div>
+            <div class="tabContent" id="documents">
+                <div id="documents-conatiner">
+                    <h2>Current Documentation</h2>
+                    <p class="docContent" id="docOut"></p>
+                </div>
+            </div>
+            <div class="tabContent" id="soc">
+                <div id="socket-conatiner">
+                    <h2>Current Socket Server Status</h2>
+                    <p id="running"></p>
+                    <p id="port"></p>
+                    <div class="center-wrap" style="text-align: center">
+                        <div id="socBut" style="display: inline-block">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tabContent" id="config">
+                <div id="config-conatiner">
+                    <h2>Configuration Variables</h2>
+                    <div id="config-table">
+                        <table id="contable"
+                               style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <p>Debugging Variables</p>
+                                </td>
+                                <td>
+                                    <button type="button" onclick="getVars('dev')">Select</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>System Variables</p>
+                                </td>
+                                <td>
+                                    <button type="button" onclick="getVars('sys')">Select</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Table Variables</p>
+                                </td>
+                                <td>
+                                    <button type="button" onclick="getVars('table')">Select</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Socket Variables</p>
+                                </td>
+                                <td>
+                                    <button type="button" onclick="getVars('socket')">Select</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <h3>Values</h3>
+                    <div class="var-table-class" id="var-table">
+                        <table id="vartable"
+                               style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="center-wrap" style="text-align: center">
+                        <div style="display: inline-block">
+                            <button style="margin: 0 auto;" type="button" onclick="varUpdate()">Submit Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="col3">
+            <h2>Navagation</h2>
+            <ul>
+                <li>
+                    <a href="/">Home</a>
+                    <ul>
+                        <li>
+                            <p><b>Maintenance Console</b></p>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/users">User Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/traffic">Traffic Console</a>
+                        </li>
+                        <li>
+                            <a href="/tables">Table Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/logs">Log Console</a>
+                        </li>
+                        <li>
+                            <a href="/transactions">Transaction Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/devices">Device Console</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/user/options">User Options</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row3">
+    <footer id="footer" class="clear">
+        <h1>JavaByte Modern Database</h1>
+        <p class="fl_left">2019 Kirchner Solutions - All Rights Reserved - <a
+                href="https://kirchnerbusinesssolutions.com">Kirchner Business Solutions</a></p>
+    </footer>
+</div>
+</body>
+</html>

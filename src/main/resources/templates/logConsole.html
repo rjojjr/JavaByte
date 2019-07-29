@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>JavaByte Log Console</title>
+    <meta charset="UTF-8">
+
+    <link type="text/css" th:href="@{/styles/layout.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/general.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/tabs.css}" rel="stylesheet">
+    <!--
+    <link rel="stylesheet" type="text/css" href="/styles/layout.css">
+    <link rel="stylesheet" type="text/css" href="/styles/general.css">
+    <link rel="stylesheet" type="text/css" href="/styles/tabs.css">
+    -->
+    <!--[if lt IE 9]>
+    <script src="../static/scripts/html5shiv.js"></script><![endif]-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <script th:src="@{/scripts/sockjs.js}"></script>
+    <script th:src="@{/scripts/stomp.js}"></script>
+    <script th:src="@{/scripts/tabs.js}"></script>
+    <script th:src="@{/scripts/StompLogs.js}"></script>
+    <!--
+    <script src="/scripts/sockjs.js"></script>
+    <script src="/scripts/stomp.js"></script>
+    <script src="/scripts/tabs.js"></script>
+    <script src="/scripts/StompUsers.js"></script>
+    -->
+
+    <script>
+
+    </script>
+    <script>
+
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var visited = /*[[${user.username}]]*/ '0';
+
+        /*]]>*/
+        setUname(visited);
+    </script>
+</head>
+<body onload="init()" onclick="checkStatus()">
+<div class="wrapper row1">
+    <header id="header" class="clear">
+        <h1>JavaByte Log Console</h1>
+        <p th:object="${user}" th:text="*{msg}" style="color:red; text-align: center;"><b></b></p>
+    </header>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row2">
+    <div id="container" class="clear">
+        <div id="col1">
+            <h2>Logged in as</h2>
+            <p th:object="${user}" th:text="*{username}" style="color:red; text-align: center;"><b></b></p>
+            <a href="/logout">Logoff</a>
+            <hr>
+        </div>
+        <div id="col2">
+            <ul id="tabs">
+                <li><a href="#tables">Log Summary</a></li>
+                <li><a href="#filters">Log Filters</a></li>
+                <li><a href="#ip">Search Results</a></li>
+            </ul>
+            <div class="tabContent" id="tables" onclick="deleteResults()">
+                <hr>
+                <h2>Log Summary</h2>
+                <div id="tables-container">
+                    <div id="tableresult-table">
+                        <table style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <tbody>
+                            <tr>
+                                <th style="text-align: center;"><p style=""><b>Log Type</b></th>
+                                <th style="text-align: center;"><p style=""><b>Log Count</b></th>
+                                <th style="text-align: center;"><p style=""><b>View Logs</b></th>
+                                <th style="text-align: center;"><p style=""><b>Dump Logs</b></th>
+                            </tr>
+                            <tr th:each="LogBean, stat : ${list}">
+                                <td th:text="${LogBean.name}">
+                                </td>
+                                <td th:text="${LogBean.count}">
+                                </td>
+                                <td>
+                                    <button th:data1="${LogBean.name}" onclick="setTablename(this.getAttribute('data1'))">Select</button>
+                                </td>
+                                <td>
+                                    <button th:data1="${LogBean.name}" onclick="dumpLog(this.getAttribute('data1'))">Dump Logs</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="center-wrap" style="text-align: center">
+                        <div style="display: inline-block">
+                            <button type="button" style="alignment: center" onclick="searchLogs()">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tabContent" id="filters">
+                <hr>
+                <h2 id="filter">Log Filters</h2>
+                <div id="filter-container">
+                    <div id="tablefilter-table">
+                        <table style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <tbody>
+
+                            <tr>
+                                <td>
+                                    <p>Start Time(Results after this time)</p>
+                                </td>
+                                <td><input id="sdate" type="text" placeholder="MM-DD-YYYY~HH~MM~SS"/>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td>
+                                    <p>End Time(Results before this time)</p>
+                                </td>
+                                <td><input id="edate" type="text" placeholder="MM-DD-YYYY~HH~MM~SS"/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="center-wrap" style="text-align: center">
+                        <div style="display: inline-block">
+                            <button type="button" style="alignment: center" onclick="searchLogs()">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tabContent" id="ip">
+                <hr>
+                <h3 id="result">Results</h3>
+                <p id="empty" style="color:red; text-align: center;"><b></b></p>
+                <div id="activeuser1-table">
+                    <table id="userResult"
+                           style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                           border="1" cellpadding="2"
+                           cellspacing="2">
+                        <thead>
+                        <tr>
+                            <th style="text-align: center;"><p style=""><b>Time</b></th>
+                            <th style="text-align: center;"><p style=""><b>Log</b></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="col3">
+            <h2>Navagation</h2>
+            <ul>
+                <li><a href="/">Home</a>
+
+                    <ul>
+                        <li><p><b>Log Console</b></p>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/users">User Console</a>
+                        </li>
+                        <li>
+                            <a href="/tables">Table Console</a>
+
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/traffic">Traffic Console</a>
+                        </li>
+                        <li>
+                            <a href="/transactions">Transaction Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/maintenance">Maintenance Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/devices">Device Console</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/user/options">User Options</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row3">
+    <footer id="footer" class="clear">
+        <h1>JavaByte Modern Database</h1>
+        <p class="fl_left">2019 Kirchner Solutions - All Rights Reserved - <a
+                href="https://kirchnerbusinesssolutions.com">Kirchner Business Solutions</a></p>
+    </footer>
+</div>
+</body>
+</html>

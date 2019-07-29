@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>JavaByte User Console</title>
+    <meta charset="UTF-8">
+
+    <link type="text/css" th:href="@{/styles/layout.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/general.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/tabs.css}" rel="stylesheet">
+    <!--
+    <link rel="stylesheet" type="text/css" href="/styles/layout.css">
+    <link rel="stylesheet" type="text/css" href="/styles/general.css">
+    <link rel="stylesheet" type="text/css" href="/styles/tabs.css">
+    -->
+    <!--[if lt IE 9]>
+    <script src="../static/scripts/html5shiv.js"></script><![endif]-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <script  th:src="@{/scripts/sockjs.js}"></script>
+    <script  th:src="@{/scripts/stomp.js}"></script>
+    <script  th:src="@{/scripts/tabs.js}"></script>
+    <script  th:src="@{/scripts/StompUsers.js}"></script>
+    <!--
+    <script src="/scripts/sockjs.js"></script>
+    <script src="/scripts/stomp.js"></script>
+    <script src="/scripts/tabs.js"></script>
+    <script src="/scripts/StompUsers.js"></script>
+    -->
+
+    <script>
+
+    </script>
+    <script>
+
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var visited = /*[[${user.username}]]*/ '0';
+
+        /*]]>*/
+        setUname(visited);
+    </script>
+</head>
+<body onload="init()" onclick="checkStatus()">
+<div class="wrapper row1">
+    <header id="header" class="clear">
+        <h1>JavaByte User Console</h1>
+        <p th:object="${user}" th:text="*{msg}" style="color:red; text-align: center;"><b></b></p>
+    </header>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row2">
+    <div id="container" class="clear">
+        <div id="col1">
+            <h2>Logged in as</h2>
+            <p th:object="${user}" th:text="*{username}" style="color:red; text-align: center;"><b></b></p>
+            <a href="/logout">Logoff</a>
+            <hr>
+            <button type="button" onclick="createUser()">Create New User</button>
+        </div>
+        <div id="col2">
+            <ul id="tabs">
+                <li><a href="#active">Active Users</a></li>
+                <li><a href="#browse">User Browser</a></li>
+                <li><a href="#msg">User Messaging</a></li>
+            </ul>
+            <div class="tabContent" id="active" onclick="deleteTable()">
+                <h2>Active Users</h2>
+                <div id="active-container">
+                    <div id="activeuser-table">
+                        <table style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <tbody>
+                            <tr>
+                                <th style="text-align: center;"><p style=""><b>Username</b></th>
+                                <th style="text-align: center;"><p style=""><b>First Name</b></th>
+                                <th style="text-align: center;"><p style=""><b>Last Name</b></th>
+                                <th style="text-align: center;"><p style=""><b>ID</b></th>
+                                <th style="text-align: center;"><p style=""><b>System Admin</b></th>
+                                <th style="text-align: center;"><p style=""><b>Index</b></th>
+                                <th style="text-align: center;"><p style=""><b>IP Address</b></th>
+                                <th style="text-align: center;"><p style=""><b>Session Type</b></th>
+                                <th style="text-align: center;"><p style=""><b>Device Type</b></th>
+                                <th style="text-align: center;"><p style=""><b>User Summary</b></th>
+                                <th style="text-align: center;"><p style=""><b>Kick User</b></th>
+                            </tr>
+
+                            <tr th:each="UserListBean, stat : ${list}">
+
+                                <td
+                                        th:text="${UserListBean.username}">
+                                </td>
+                                <td th:text="${UserListBean.firstname}">
+                                </td>
+                                <td th:text="${UserListBean.lastname}">
+                                </td>
+                                <td th:text="${UserListBean.id}">
+                                </td>
+                                <td th:text="${UserListBean.admin}">
+                                </td>
+                                <td th:text="${UserListBean.index}">
+                                </td>
+                                <td th:text="${UserListBean.ip}">
+                                </td>
+                                <td th:text="${UserListBean.sessiontype}">
+                                </td>
+                                <td th:text="${UserListBean.device}">
+                                </td>
+                                <td>
+                                    <button th:data1="${UserListBean.idi}" onclick="userSummary(this.getAttribute('data1'))">Summary</button>
+                                </td>
+                                <td>
+                                    <button th:data1="${UserListBean.idi}" onclick="kickUser(this.getAttribute('data1'))">Kick User</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="tabContent" id="browse">
+                <h2>User Browser</h2>
+                <hr>
+                <div id="browse-container">
+                    <h3>Filters</h3>
+                    <div id="user-table">
+                        <table id="filterTable" style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <p>Username</p>
+                                </td>
+                                <td><input id="username" type="text"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>First Name</p>
+                                </td>
+                                <td><input id="firstname" type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Last Name</p>
+                                </td>
+                                <td><input id="lastname" type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>User ID</p>
+                                </td>
+                                <td><input id="userid" type="text"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Admin Status</p>
+                                </td>
+                                <td><input id="admin" type="text"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Index</p>
+                                </td>
+                                <td><input id="index" type="number" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>IP Address</p>
+                                </td>
+                                <td><input id="ip" type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Session Type</p>
+                                </td>
+                                <td><input id="session" type="text" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Device</p>
+                                </td>
+                                <td><input id="device" type="text" />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" onclick="searchUsers()">Search</button>
+                    </div>
+                    <hr>
+                    <h3>Results</h3>
+                    <div id="activeuser1-table">
+                        <table id="userResult" style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <thead>
+                            <tr>
+                                <th style="text-align: center;"><p style=""><b>Username</b></th>
+                                <th style="text-align: center;"><p style=""><b>First Name</b></th>
+                                <th style="text-align: center;"><p style=""><b>Last Name</b></th>
+                                <th style="text-align: center;"><p style=""><b>ID</b></th>
+                                <th style="text-align: center;"><p style=""><b>System Admin</b></th>
+                                <th style="text-align: center;"><p style=""><b>Index</b></th>
+                                <th style="text-align: center;"><p style=""><b>IP Address</b></th>
+                                <th style="text-align: center;"><p style=""><b>Session Type</b></th>
+                                <th style="text-align: center;"><p style=""><b>Device Type</b></th>
+                                <th style="text-align: center;"><p style=""><b>User Summary</b></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="tabContent" id="msg" onclick="deleteTable()">
+                <h2>User Messaging</h2>
+                <div id="msg-container">
+                    <h3>Active Users</h3>
+                    <div id="activeuser2-table">
+                        <table style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <tbody>
+                            <tr>
+                                <th style="text-align: center;"><p style=""><b>Username</b></th>
+                                <th style="text-align: center;"><p style=""><b>First Name</b></th>
+                                <th style="text-align: center;"><p style=""><b>Last Name</b></th>
+                                <th style="text-align: center;"><p style=""><b>ID</b></th>
+                                <th style="text-align: center;"><p style=""><b>System Admin</b></th>
+                                <th style="text-align: center;"><p style=""><b>Index</b></th>
+                                <th style="text-align: center;"><p style=""><b>IP Address</b></th>
+                                <th style="text-align: center;"><p style=""><b>Session Type</b></th>
+                                <th style="text-align: center;"><p style=""><b>Device Type</b></th>
+                                <th style="text-align: center;"><p style=""><b>Select User</b></th>
+                            </tr>
+
+                            <tr th:each="UserListBean, stat : ${list}">
+
+                                <td
+                                        th:text="${UserListBean.username}">
+                                </td>
+                                <td th:text="${UserListBean.firstname}">
+                                </td>
+                                <td th:text="${UserListBean.lastname}">
+                                </td>
+                                <td th:text="${UserListBean.id}">
+                                </td>
+                                <td th:text="${UserListBean.admin}">
+                                </td>
+                                <td th:text="${UserListBean.index}">
+                                </td>
+                                <td th:text="${UserListBean.ip}">
+                                </td>
+                                <td th:text="${UserListBean.sessiontype}">
+                                </td>
+                                <td th:text="${UserListBean.device}">
+                                </td>
+                                <td>
+                                    <button th:data-index="${UserListBean.username}" onclick="addUser(this.getAttribute('data-index'))">Select</button>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="selecteduser-table">
+                        <h3>Selected Users</h3>
+                        <table id="selected"
+                               style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                        <input id="msgbox" type="text" value="Message"/>
+                        <button type="button" onclick="send()"><b>Send</b></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="col3">
+            <h2>Navagation</h2>
+            <ul>
+                <li><a href="/">Home</a>
+
+                    <ul>
+                        <li> <p><b>User Console</b></p>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/traffic">Traffic Console</a>
+                        </li>
+                        <li>
+                            <a href="/tables">Table Console</a>
+
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/logs">Log Console</a>
+                        </li>
+                        <li>
+                            <a href="/transactions">Transaction Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/maintenance">Maintenance Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/devices">Device Console</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/user/options">User Options</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row3">
+    <footer id="footer" class="clear">
+        <h1>JavaByte Modern Database</h1>
+        <p class="fl_left">2019 Kirchner Solutions - All Rights Reserved - <a
+                href="https://kirchnerbusinesssolutions.com">Kirchner Business Solutions</a></p>
+    </footer>
+</div>
+</body>
+</html>

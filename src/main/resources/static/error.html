@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>RPOS: Retail POS Console Home</title>
+<meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="/styles/layout.css">
+  <link rel="stylesheet" type="text/css" href="/styles/general.css">
+<!--[if lt IE 9]>
+  <script src="../static/scripts/html5shiv.js"></script><![endif]-->
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+  <link rel="manifest" href="/favicon/site.webmanifest">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <script src="http://cdn.sockjs.org/sockjs-0.3.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
+  <script>
+    var context_path = "${pageContext.request.contextPath}";
+    var socket = new SockJS('/ws');
+    //var socket = new SockJS('/specific/message');
+    var stompClient = Stomp.over(socket);
+    //var connid = utils.random_string(8);
+    var sessionId = "";
+
+    var username = "";
+
+    function setUname(Uname){
+      username = Uname;
+    }
+
+    var connect_callback = function() {
+      // called back after the client is connected and authenticated to the STOMP server
+      stompClient.subscribe('/user/queue/notify', function (msgOut) {
+        alert(msgOut.body);
+      });
+      sendUsername();
+    };
+
+    stompClient.connect({}, function (frame) {
+      var suffix = frame.headers['queue-suffix'];
+      var url = stompClient.ws._transport.url;
+      sessionId = /\/([^\/]+)\/websocket/.exec(socket._transport.url)[1];
+      //sessionId = /\/([^\/]+)\/websocket/.exec(socket._transport.url)[1];
+      url = url.replace(
+              "/ws://localhost:8080/messagesocket/specific/message//ig",  "");
+      url = url.replace("//websocket/ig", "");
+      url = url.replace(/^[0-9]+\//, "");
+      console.log("Your current session is: " + sessionId);
+      connect_callback()
+    });
+
+
+
+    function disconnect() {
+      if(stompClient != null) {
+        stompClient.disconnect();
+      }
+      console.log("Disconnected");
+    }
+
+    function sendUsername() {
+      stompClient.send("/app/register", {},
+              JSON.stringify({'username':username, 'session':sessionId}));
+    }
+  </script>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+
+    var visited = /*[[${user.username}]]*/ '0';
+
+    /*]]>*/
+    setUname(visited);
+  </script>
+</head>
+<body>
+<div class="wrapper row1">
+  <header id="header" class="clear">
+    <h1>RPOS Console Home</h1>
+    <p th:object="${user}" th:text="*{msg}" style="color:red; text-align: center;"><b></b></p>
+  </header>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row2">
+  <div id="container" class="clear">
+    <div id="col1">
+      <h2>Logged in as</h2>
+      <p th:object="${user}" th:text="*{username}" style="color:red; text-align: center;"><b></b></p>
+      <form action ="#" th:action="@{/logout}" th:object="${user}" method="post" style="text-align: center;">
+        <p><input type="submit" value="Logout" /></p>
+      </form>
+      <hr>
+      <p><b>Select desired console.</b></p>
+    </div>
+    <div id="col2">
+      <h2>Menu</h2>
+      <table style="text-align: left; margin-left: auto; margin-right: auto;">
+
+        <tr>
+          <td style="">
+            <a href="/users"><b>User Console</b></a>
+          </td>
+        </tr>
+        <tr>
+          <td style="">
+            <a href="/reciepts"><b>Reciept Console</b></a>
+          </td>
+        </tr>
+        <tr>
+          <td style="">
+            <a href="/inventory"><b>Inventory Console</b></a>
+          </td>
+        </tr>
+        <tr>
+          <td style="">
+            <a href="/terminals"><b>Terminal Console</b></a>
+          </td>
+        </tr>
+        <tr>
+          <td style="">
+            <a href="/logs"><b>Log Console</b></a>
+          </td>
+        </tr>
+        <tr>
+          <td style="">
+            <a href="/metrics"><b>Metrics Console</b></a>
+          </td>
+        </tr>
+        <tr>
+          <td style="">
+            <a href="/maintenance"><b>Maintenance Console</b></a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="col3">
+      <h2>Navagation</h2>
+      <ul>
+        <li><p><b>Home</b></p>
+          <ul>
+            <li><a href="/users">User Console</a>
+            </li>
+            <li>
+              <a href="/inventory">Inventory Console</a>
+            </li>
+            <li>
+              <a href="/maintenance">Maintenance Console</a>
+            </li>
+            <li>
+              <a href="/reciepts">Reciept Console</a>
+            </li>
+            <li>
+              <a href="/terminals">Terminal Console</a>
+            </li>
+            <li>
+              <a href="/logs">Log Console</a>
+            </li>
+            <li>
+              <a href="/metrics">Metrics Console</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row3">
+  <footer id="footer" class="clear">
+    <h1>RPOS: Retail POS</h1>
+    <p class="fl_left">2019 Kirchner Solutions - All Rights Reserved - <a href="https://kirchnerbusinesssolutions.com">Kirchner Business Solutions</a></p>
+    <p class="fl_right">Thanks to <a href="https://www.os-templates.com/" title="Free Website Templates">OS Templates</a></p>
+  </footer>
+</div>
+</body>
+</html>

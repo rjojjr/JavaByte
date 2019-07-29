@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Page Under Construction</title>
+    <meta charset="UTF-8">
+    <link type="text/css" th:href="@{/styles/layout.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/general.css}" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="../static/scripts/html5shiv.js"></script><![endif]-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <script  th:src="@{/scripts/sockjs.js}"></script>
+    <script  th:src="@{/scripts/stomp.js}"></script>
+    <script  th:src="@{/scripts/home.js}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var visited = /*[[${user.username}]]*/ '0';
+
+        /*]]>*/
+        setUname(visited);
+        getCert();
+    </script>
+
+</head>
+<body onclick="checkStatus()">
+<div class="wrapper row1">
+    <header id="header" class="clear">
+        <h1>JavaByte Page Under Construction</h1>
+        <p th:object="${user}" th:text="*{msg}" style="color:red; text-align: center;"><b></b></p>
+    </header>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row2">
+    <div id="container" class="clear">
+        <div id="col1">
+            <h2>Logged in as</h2>
+            <p th:object="${user}" th:text="*{username}" style="color:red; text-align: center;"><b></b></p>
+            <a href="/logout">Logoff</a>
+            <hr>
+        </div>
+        <div id="col2">
+            <h2>Under Construction</h2>
+            <hr>
+            <br>
+            <h3>This page is under construction<br>Please check back later</h3>
+        </div>
+        <div id="col3">
+            <h2>Navagation</h2>
+            <ul>
+                <li>
+                    <a href="/">Home</a>
+
+                    <ul>
+                        <ul>
+                            <li>
+                                <p><b>Under Construction</b></p>
+                            </li>
+                        </ul>
+                        <li th:if="${user.admin}">
+                            <a href="/users">User Console</a>
+                        </li>
+                        <li>
+                            <a href="/tables">Table Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/logs">Log Console</a>
+                        </li>
+                        <li>
+                            <a href="/transactions">Transaction Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/maintenance">Maintenance Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/devices">Device Console</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/user/options">User Options</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row3">
+    <footer id="footer" class="clear">
+        <h1>JavaByte Modern Database</h1>
+        <p class="fl_left">2019 Kirchner Solutions - All Rights Reserved - <a
+                href="https://kirchnerbusinesssolutions.com">Kirchner Business Solutions</a></p>
+        <!--<p class="fl_right">Thanks to <a href="https://www.os-templates.com/" title="Free Website Templates">OS
+            Templates</a></p>-->
+    </footer>
+</div>
+</body>
+</html>

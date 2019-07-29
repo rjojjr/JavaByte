@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>JavaByte Table Console</title>
+    <meta charset="UTF-8">
+    <link type="text/css" th:href="@{/styles/layout.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/general.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/tabs.css}" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="../static/scripts/html5shiv.js"></script><![endif]-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <script th:src="@{/scripts/sockjs.js}"></script>
+    <script th:src="@{/scripts/stomp.js}"></script>
+    <script th:src="@{/scripts/tabsTable.js}"></script>
+    <script th:src="@{/scripts/StompTable.js}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var visited = /*[[${user.username}]]*/ '0';
+
+        /*]]>*/
+        setUname(visited);
+    </script>
+</head>
+<body onload="init()" onclick="checkStatus()">
+
+<div class="wrapper row1">
+    <header id="header" class="clear">
+        <h1>JavaByte Table Console</h1>
+        <p th:object="${user}" th:text="*{msg}" style="color:red; text-align: center;"><b></b></p>
+    </header>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row2">
+    <div id="container" class="clear">
+        <div id="col1">
+            <h2>Logged in as</h2>
+            <p th:object="${user}" th:text="*{username}" style="color:red; text-align: center;"><b></b></p>
+            <a href="/logout">Logoff</a>
+            <hr>
+        </div>
+        <div id="col2">
+            <ul id="tabs">
+                <li><a href="#sum">Tables Summary</a></li>
+                <li><a href="#query">Table Query</a></li>
+            </ul>
+            <div class="tabContent" id="sum">
+                <div id="sum-container">
+                    <div id="tables-conatiner">
+                        <h2>Tables</h2>
+                        <hr>
+                        <h3>Active Tables</h3>
+                        <div id="activetable-table">
+                            <table style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                                   border="1" cellpadding="2"
+                                   cellspacing="2">
+                                <tbody>
+                                <tr>
+                                    <th style="text-align: center;"><p style=""><b>Table Name</b></th>
+                                    <th style="text-align: center;"><p style=""><b>Select Table</b></th>
+                                </tr>
+
+                                <tr th:each="String, stat : ${tables}">
+                                    <td th:text="${String}"></td>
+                                    <td>
+                                        <button th:data1="${String}" onclick="tableSummary(this.getAttribute('data1'))">
+                                            Summary
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+                        <h3 id="tabHead">Table Status</h3>
+                        <div id="table-table">
+                            <table id="table"
+                                   style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                                   border="1" cellpadding="2"
+                                   cellspacing="2">
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tabContent" id="query">
+                <div id="query-conatiner">
+                    <h3 id="tabFilterHead">Query Filters</h3>
+                    <div id="tablefilter-table">
+                        <table id="tablefilter"
+                               style="border-collapse:collapse; align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="center-wrap" style="text-align: center">
+                    <div style="display: inline-block">
+                        <button type="button" style="alignment: center" onclick="queryTable()">Search</button>
+                    </div>
+                    </div>
+                    <hr>
+                    <h2 id="tableResultHead">Results</h2>
+                    <div id="activeuser2-table">
+                        <table id="tableresult"
+                               style="border-collapse:collapse; align: center; text-align: center; width: 100%;"
+                               border="1" cellpadding="2"
+                               cellspacing="2">
+                            <tbody>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="col3">
+            <h2>Navagation</h2>
+            <ul>
+                <li>
+                    <a href="/">Home</a>
+                    <ul>
+                        <li>
+                            <p><b>Table Console</b></p>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/users">User Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/traffic">Traffic Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/maintenance">Maintenance Consolee</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/logs">Log Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/transactions">Transaction Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/devices">Device Console</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/user/options">User Options</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row3">
+    <footer id="footer" class="clear">
+        <h1>JavaByte Modern Database</h1>
+        <p class="fl_left">2019 Kirchner Solutions - All Rights Reserved - <a
+                href="https://kirchnerbusinesssolutions.com">Kirchner Business Solutions</a></p>
+    </footer>
+</div>
+</body>
+</html>

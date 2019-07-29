@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Database Edit User</title>
+    <meta charset="UTF-8">
+    <link type="text/css" th:href="@{/styles/layout.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/general.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/tabs.css}" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="../static/scripts/html5shiv.js"></script><![endif]-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <script  th:src="@{/scripts/sockjs.js}"></script>
+    <script  th:src="@{/scripts/stomp.js}"></script>
+    <script  th:src="@{/scripts/tabs.js}"></script>
+    <script  th:src="@{/scripts/EditUser.js}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var visited = /*[[${user.username}]]*/ '0';
+
+        /*]]>*/
+        setUname(visited);
+    </script>
+</head>
+<body onclick="checkStatus()">
+<div class="wrapper row1">
+    <header id="header" class="clear">
+        <h1>Database Edit User</h1>
+        <p th:object="${user}" th:text="*{msg}" style="color:red; text-align: center;"><b></b></p>
+    </header>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row2">
+    <div id="container" class="clear">
+        <div id="col1">
+            <h2>Logged in as</h2>
+            <p th:object="${user}" th:text="*{username}" style="color:red; text-align: center;"><b></b></p>
+            <a href="/logout">Logoff</a>
+            <hr>
+            <p><b>Edit User</b></p>
+        </div>
+        <div id="col2">
+            <ul id="tabs">
+                <li><a href="#info">Edit User Info</a></li>
+                <li><a href="#pw">Reset User Password</a></li>
+            </ul>
+            <div class="tabContent" id="info">
+                <h2>Edit Information</h2>
+                <div id="info-container">
+                    <form action="#" th:action="@{/users/edit/submit}" th:object="${UserListBean}" method="post"
+                          style="text-align: center;">
+                        <div id="activeuser-table">
+
+                            <table style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                                   border="1" cellpadding="2"
+                                   cellspacing="2">
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <p><b>Username: </b></p>
+                                    </td>
+                                    <td>
+                                        <input type="text" th:field="*{username}" th:value="*{username}" style=""/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>First Name: </b></p>
+                                    </td>
+                                    <td>
+                                        <input type="text" th:field="*{firstname}" th:value="*{firstname}" style=""/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>Last Name: </b></p>
+                                    </td>
+                                    <td>
+                                        <input type="text" th:field="*{lastname}" th:value="*{lastname}" style=""/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>User ID: </b></p>
+                                    </td>
+                                    <td>
+                                        <input type="text" th:field="*{id}" th:value="*{id}" style=""/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>System Admin: </b></p>
+                                    </td>
+                                    <td>
+                                        <input type="text" th:field="*{admin}" th:value="*{admin}" style=""/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>User Index: </b></p>
+                                    </td>
+                                    <td >
+                                        <input type="text" th:field="*{index}" th:value="*{index}" style="" readonly/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>User IP Address: </b></p>
+                                    </td>
+                                    <td th:text="${UserListBean.ip}">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>User Session Type: </b></p>
+                                    </td>
+                                    <td th:text="${UserListBean.sessiontype}">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>User Device Type: </b></p>
+                                    </td>
+                                    </td>
+                                    <td th:text="${UserListBean.device}">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <input type="submit" value="Submit Changes"/>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="tabContent" id="pw">
+                <h2>Reset Password</h2>
+                <div id="pw-container">
+                    <form action="#" th:action="@{/users/edit/submitpassword}" th:object="${pw}" method="post"
+                          style="text-align: center;">
+                        <div id="activeuser1-table">
+
+                            <table style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                                   border="1" cellpadding="2"
+                                   cellspacing="2">
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <p><b>New Password: </b></p>
+                                    </td>
+                                    <td>
+                                        <input type="text" th:field="*{newpassword}" th:value="*{newpassword}" style=""/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>Confirm Password: </b></p>
+                                    </td>
+                                    <td>
+                                        <input type="text" th:field="*{passwordConfirm}" th:value="*{passwordConfirm}" style=""/>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <input type="submit" value="Reset Password"/>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="col3">
+            <h2>Navagation</h2>
+            <ul>
+                <li><a href="/">Home</a>
+
+                    <ul>
+                        <li><a href="/users">User Console</a>
+                            <ul>
+                                <li><p><b>Edit User</b></p></li>
+                            </ul>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/traffic">Traffic Console</a>
+                        </li>
+                        <li>
+                            <a href="/tables">Table Console</a>
+
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/logs">Log Console</a>
+                        </li>
+                        <li>
+                            <a href="/transactions">Transaction Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/maintenance">Maintenance Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/devices">Device Console</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/user/options">User Options</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row3">
+    <footer id="footer" class="clear">
+        <h1>JavaByte Modern Database</h1>
+        <p class="fl_left">2019 Kirchner Solutions - All Rights Reserved - <a
+                href="https://kirchnerbusinesssolutions.com">Kirchner Business Solutions</a></p>
+    </footer>
+</div>
+</body>
+</html>

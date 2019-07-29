@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>JavaByte Database Logon</title>
+    <meta charset="UTF-8">
+    <link type="text/css" th:href="@{/styles/layout.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/general.css}" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="../static/scripts/html5shiv.js"></script><![endif]-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <script  th:src="@{/scripts/sockjs.js}"></script>
+    <script  th:src="@{/scripts/stomp.js}"></script>
+    <script>
+        var context_path = "${pageContext.request.contextPath}";
+        var socket = new SockJS('/ws');
+        //var socket = new SockJS('/specific/message');
+        var stompClient = Stomp.over(socket);
+        //var connid = utils.random_string(8);
+        var sessionId = "";
+
+        var deviceCert = "null"
+
+        var username = "null";
+        var ip = "null";
+
+        function setIP(newip) {
+            ip = newip;
+        }
+
+        function setDeviceCert(cert) {
+            deviceCert = cert;
+
+        }
+
+        function setUname(Uname){
+            username = Uname;
+        }
+
+        var connect_callback = function() {
+            // called back after the client is connected and authenticated to the STOMP server
+            stompClient.subscribe('/user/queue/notify', function (msgOut) {
+                //0 = kick, 1 = device cert, 3 = display msg, 2 revalidate page
+                if(msg[0] == 1){
+                    writeCert(msg[1]);
+                }
+                if(msg[0] == 2){
+                    location.href = "/?user=" + username;
+                }
+                if (msg[0] == 3) {
+                    var msg = 'Message From: ' + msg[1] + '\n' + msg[2];
+                    alert(msg);
+                }
+                if (msg[0] == 4) {
+                    //handle
+                }
+                if(msg[0] == 0){
+                    location.href = "/notallowed"
+                }
+            });
+            sendUsername();
+        };
+
+        stompClient.connect({}, function (frame) {
+            var suffix = frame.headers['queue-suffix'];
+            var url = stompClient.ws._transport.url;
+            sessionId = /\/([^\/]+)\/websocket/.exec(socket._transport.url)[1];
+            //sessionId = /\/([^\/]+)\/websocket/.exec(socket._transport.url)[1];
+            url = url.replace(
+                "/ws://localhost:8080/messagesocket/specific/message//ig",  "");
+            url = url.replace("//websocket/ig", "");
+            url = url.replace(/^[0-9]+\//, "");
+            console.log("Your current session is: " + sessionId);
+            connect_callback()
+        });
+
+
+
+        function disconnect() {
+            if(stompClient != null) {
+                stompClient.disconnect();
+            }
+            console.log("Disconnected");
+        }
+
+        function sendUsername() {
+            stompClient.send("/app/register", {},
+                JSON.stringify({'username':username, 'session':sessionId}));
+        }
+
+
+
+        function sendDeviceCert(cert) {
+            stompClient.send("/app/device/cert", {},
+                JSON.stringify({'cert':cert, 'user':sessionId, 'ip':ip}));
+        }
+
+        function writeCert(cert) {
+            if (typeof (Storage) !== "undefined") {
+                // Code for localStorage
+                localStorage.setItem("cert", cert);
+            }
+        }
+
+        function getCert() {
+            if (typeof (Storage) !== "undefined") {
+                // Code for localStorage
+                if (localStorage.length == 0) {
+                    setDeviceCert(0)
+                } else {
+                    if (localStorage.getItem("cert") > "1") {
+                        setDeviceCert(localStorage.getItem("cert"))
+                    }
+                }
+            } else {
+                setDeviceCert(-1);
+            }
+        }
+
+        function refresh() {
+            location.href = "/";
+        }
+    </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var ip = /*[[${ip.ip}]]*/ 'null';
+
+        /*]]>*/
+        setIP(ip);
+        </script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var ref = /*[[${ip.refresh}]]*/ 'null';
+
+        /*]]>*/
+        if(ref == true){
+            refresh();
+        }
+    </script>
+</head>
+<body>
+<div class="wrapper row1">
+    <header id="header" class="clear">
+        <h1>JavaByte Logon</h1>
+    </header>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row2">
+    <div id="container" class="clear">
+        <div id="col1">
+            <hr>
+            <p><b>Enter credentials to logon.</b></p>
+            <p th:object="${form}" th:value="*{msg}"></p>
+        </div>
+        <div id="col2">
+            <h2>Logon Form</h2>
+            <form action="#" th:action="@{/logon}" th:object="${form}" method="post"
+                  style="text-align: center;">
+                <table style="text-align: left; margin-left: auto; margin-right: auto;">
+                    <tr>
+                        <td style="width:150px ">
+                            <p style=""><b>Username</b></p>
+                        </td>
+                        <td>
+                            <input type="text" th:field="*{username}" value="" style=""/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:150px ">
+                            <p style=""><b>Password</b></p>
+                        </td>
+                        <td>
+                            <input type="password" th:field="*{password}" value="" style=""/>
+                        </td>
+                    </tr>
+                </table>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        <div id="col3">
+            <h2>Navagation</h2>
+            <ul>
+                <li><p><b>Logon</b></p>
+                    <ul>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row3">
+    <footer id="footer" class="clear">
+        <h1>JavaByte Modern Database</h1>
+        <p class="fl_left">2019 Kirchner Solutions - All Rights Reserved - <a
+                href="https://kirchnerbusinesssolutions.com">Kirchner Business Solutions</a></p>
+    </footer>
+</div>
+</body>
+</html>
