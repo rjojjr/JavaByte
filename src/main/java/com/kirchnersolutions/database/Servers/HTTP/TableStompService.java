@@ -46,7 +46,7 @@ public class TableStompService {
     void createTable(StompTableRequest request) throws Exception{
         debuggingService.stompDebug("@Stomp User " + request.getUsername() + " session id " + request.getSessionid() + " request to create table " + request.getTablename());
         WebSession session = (WebSession)sessionService.getSessionByUsername(request.getUsername());
-        if(session != null){
+        if(session != null && session.getUser().getDetail("admin").contains("t")){
             Transaction transaction = new Transaction();
             transaction.setUsername(request.getTablename());
             transaction.setRequestTime(System.currentTimeMillis());
@@ -58,7 +58,7 @@ public class TableStompService {
                 this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "3%System%Operation failed", createHeaders(request.getSessionid()));
             }
         }else{
-            this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "3%System%Operation failed", createHeaders(request.getSessionid()));
+            this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "3%System%Operation failed due to improper credentials", createHeaders(request.getSessionid()));
         }
 
     }

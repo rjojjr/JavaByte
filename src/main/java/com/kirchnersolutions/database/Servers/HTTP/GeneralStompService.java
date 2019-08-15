@@ -150,25 +150,30 @@ public class GeneralStompService {
     }
 
     void setVars(StompTableRequest request) throws Exception{
-        String type = request.getTablename();
-        String[] vars = request.getQuery().split(",");
-        int count = 0;
-        for(String var : vars){
-            String[] temp = var.split(":");
-            vars[count] = temp[1];
-            count++;
+        Session session = sessionService.getSessionByUsername(request.getUsername());
+        if(session != null && session.getUser().getDetail("admin").contains("t")){
+            String type = request.getTablename();
+            String[] vars = request.getQuery().split(",");
+            int count = 0;
+            for(String var : vars){
+                String[] temp = var.split(":");
+                vars[count] = temp[1];
+                count++;
+            }
+            try{
+                configurationService.updateConfig(type, vars);
+                request.setQuery(type);
+                getVars(request);
+            }catch (Exception e){
+                this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "3%System%There was a problem with your request.", createHeaders(request.getSessionid()));
+                debuggingService.stompDebug("@Stomp Set variable request by: " + request.getUsername() + " failed due to exception");
+                debuggingService.throwDevException(new DevelopmentException(e.getMessage()));
+                debuggingService.nonFatalDebug(e.getMessage());
+            }
+        }else {
+            debuggingService.stompDebug("@Stomp Set variable request by: " + request.getUsername() + " failed due to invalid credentials");
+            this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "deny%System%You do not have the credentials to use this function.", createHeaders(request.getSessionid()));
         }
-        try{
-            configurationService.updateConfig(type, vars);
-            request.setQuery(type);
-            getVars(request);
-        }catch (Exception e){
-            this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "3%System%There was a problem with your request.", createHeaders(request.getSessionid()));
-            debuggingService.stompDebug("@Stomp Set variable request by: " + request.getUsername() + " failed due to exception");
-            debuggingService.throwDevException(new DevelopmentException(e.getMessage()));
-            debuggingService.nonFatalDebug(e.getMessage());
-        }
-
     }
 
     void benchCPU(String stompID) {
@@ -187,13 +192,25 @@ public class GeneralStompService {
     }
 
     void reboot(String username, Session admin){
-        debuggingService.stompDebug("@Stomp Application reboot called by " + username);
-        maintenanceService.restartApplication(admin);
+        Session session = sessionService.getSessionByUsername(username);
+        if(session != null && session.getUser().getDetail("admin").contains("t")){
+            debuggingService.stompDebug("@Stomp Application reboot called by " + username);
+            maintenanceService.restartApplication(admin);
+        }else {
+            debuggingService.stompDebug("@Stomp Application reboot request by: " + username + " failed due to invalid credentials");
+
+        }
+
     }
 
     void shutdown(String username, Session session){
-        debuggingService.stompDebug("@Stomp Application shutdown called by " + username);
-        maintenanceService.shutdown(session);
+        if(session != null && session.getUser().getDetail("admin").contains("t")){
+            debuggingService.stompDebug("@Stomp Application shutdown called by " + username);
+            maintenanceService.shutdown(session);
+        }else {
+            debuggingService.stompDebug("@Stomp Application shutdown request by: " + username + " failed due to invalid credentials");
+        }
+
     }
 
     void searchUsers(StompUserSearch search) throws Exception{
