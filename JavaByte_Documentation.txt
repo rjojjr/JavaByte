@@ -1,0 +1,671 @@
+JavaByte Modern Database
+
+General Documentation
+v1.0.00a
+
+2019 Kirchner Solutions
+www.kirchnerbusinesssolutions.com
+
+Author: Robert Kirchner Jr.
+
+#########################################################################
+
+Contents:
+
+	1. Introduction
+
+		A. Description
+		B. Table Page Technology
+		C. Indices
+		D. Transactions and Redundancy
+		E. Data Security and Safety
+		F. Scripting Service
+
+	2. Deployment
+
+		A. Host Operating Systems
+		B. Executable
+			a. Boot Jar
+			b. Application Server
+		C. Routing
+			a. Port Configuration
+			b. SSL
+			c. DNS
+		D. Configuration
+			a. Tables
+			b. System Variables
+			c. Socket Servers
+			d. Debugging
+			e. Client Devices
+
+	3. User Interface
+		A. Login Page
+		B. Home Page
+			a. Navigation
+			b. Logout
+		C. User Console
+			a. Active Users
+				I. User Summary
+					I.a. Edit User
+					I.b. Create New User
+				II. Kick User
+			b. User Browser
+			c. User Messaging
+			d. Create User
+		D. Traffic Console
+			a. Traffic Filters
+			b. Search Results.
+		E. Table Console
+			a. Tables Summary
+				I. Active Tables
+				II. Table Status
+			b. Table Query
+
+	4. Client API
+
+		A. Single Client
+
+		B. Enterprise Client	
+	
+	5. Licenses		
+
+#########################################################################
+
+1. Introduction
+
+JavaByte is a scalable high performance alternative to tradional SQL
+database solutions.
+
+-------------------------------------------------------------------------
+
+We have found a need for better business software.
+The two biggest problems with common business software:
+
+	1. Too complicated: Most simple functions require
+	   	sorting through several pages and confusing menus.
+	   We build applications from the prospective of the end users.
+	   We look at the individual functions that users will need 
+		to use, and build dynamic UI pages that have 
+		everything to perform task on one easy to use and
+		fluid page.
+	   Our solutions optimize workflow, and allow the acheivment of
+		maximum user productivity.
+	   The web apps we build can be configured, deployed, maintained,
+		backed up and restored by anyone with even very little
+		computer skill. Our solutions don't require IT staff
+		to power your operation.
+	   Our web apps are hybrids, built using combinations of 
+		the lastest cutting edge technolgies. This allows
+		us to provide very dynamic and fluid web pages
+		that are comparable to a desktop client.
+		Traditional web solutions are built on an
+		old request response framework that requires
+		every to refresh and reload the entire page.
+		That technology has two major flaws:
+			1. Slow, undynamic and not very fluid
+				workflow.
+			2. The server has to wait for a request
+				to send users and administrators
+				critical messages.
+
+	2. Huge, slow and expensive data managemnt solutions: A small 
+		scale common SQL database installation, that has yet
+		to be populated with any data, consumes Gygabytes
+		of valuable space.
+	   SQL servers use complicated, slow and wasteful file systems
+		that tend to be full of empty consumed disk and memory
+		space. These out dated file algorithms lead to many
+		locks and unnecessary waiting. This is a big factor 
+		in major slowdowns.
+	   We built a robust and proprietary file system that waste no 
+		space, requires very few locks, and due to our advanced 
+		investment in efficiency and multi-thread technique, 
+		provide very high I/O operation performance.
+
+#########################################################################
+
+The topics in this section are just general overviews of JavaByte 
+technologies, and will be covered in depth in the following sections.
+
+
+-------------------------------------------------------------------------
+
+Section Contents:
+
+A. Description
+		B. Table Page Technology
+		C. Indices
+		D. Transactions and Redundancy
+		E. Data Security and Safety
+		F. Scripting Service
+
+#########################################################################
+
+A. Description
+
+JavaByte is packaged as both a UI web app and a proprietary socket 
+application connection. The system can be managed from anywhere 
+with any web browser. 
+
+The web app is a hybrid of multiple industry leading technologies, 
+that provides dynamically updated pages, with very few HTTP
+refreshes. The system provides a very fluid user experience.
+
+The server feeds applications with an API that has interfaces for
+both single user programs, and high volume multi-user enterprise
+systems.
+
+The system has a comprehensive and extremely effcient serialization
+service. Data is serialized with very low cost generic data repres-
+entations, that have a one byte header. It is this that enables 
+very fast transactional exchanges between our multi-threaded 
+socket servers and both client and enterprise applications.
+
+The data structure provides very low seek and process times.
+Our system managed proprietary indexing algorithm combined with
+our revolutionary table page technology and thread excecution
+techniques, the data structure grows nearly infinitley with your data.
+
+Our data warehouse is compliant with most cloud platforms, and can 
+be hosted externally or locally.
+
+-------------------------------------------------------------------------
+
+B. Table Page Technology
+
+Table Page Techology was the first development that made this program
+a truly competitive alternative to traditional and common data solutions.
+
+The basis is that instead of having one large data table, there are
+many smaller tables, acting together as one. This allows task to be
+heavily multi-threaded, effcient and scalable.
+
+As your data grows, the data warehouse generates more table pages,
+based on rules set by the system administrators. Given the proper
+configuration, even though we have developed a superior indexing
+algorithm, table page technology can eliminate the need to index
+completely.
+
+-------------------------------------------------------------------------
+
+C. Indices
+
+In a traditional data solutions, indices go through multiple processes
+in order to be translated into the actual location of data. This equates
+to unnecessary and wasteful overhead. This leads to higher seek times
+and very noticeable slowdowns, especially in peek traffic conditions.
+
+We have totally eliminated that entire process. Our indices are fact
+the actual physical adresses of the data being queried.
+
+In the case that you want to index columms, each table page is in charge
+of its own indices request. When a index request in made, each table page
+spawns a configurable amount of threads to search the index. Once the
+desired amount of rows is found, all remaining active threads terminate.
+
+-------------------------------------------------------------------------
+
+D. Transactions and Redundancy
+
+We have engineered a comprehensive and complete transaction that provides 
+complete data saftey. Our transactions store every value to be changed
+in itself before making a change. This gives our transaction not only
+complete rollback ability if an operation fails, but using our advanced
+serializion and compression algorithms, stores every transaction securely.
+
+Advanced inter-process comunication technology ensures that if a rollback
+is required, that every thread is alerted and rollbacks happen smoothly
+and proper.
+
+This technology allows for individual backup and restore that can be 
+performed with no downtime. A transaction can be open, and the old values 
+restored in the manner of a simple command.
+
+We have integrated a rich and fully configurable backup and restore
+feature set. Backups can be made of individual rows, tables and the 
+database as a whole. Hashes can be configured to verify data integrity
+before a backup restore is committed. Our file hashing algorithm can
+also be used to compare all the data structures in a hash tree, and
+only restore the parts of the structre that have changed. Backups
+can also be encrypted with both symmetric and symmetric algorithms.
+
+-------------------------------------------------------------------------
+
+E. Data Security and Safety
+
+JavaByte implements both 256 bit symmetric and 2048 bit asymmetric
+encryption. JavaByte also supports HTTPS certificates. 
+
+The application connector socket supports symmetric encryption, an 
+asymmetric handshake that delivers an encrypted symmetric key and total 
+asymmetric encryption. Total asymmetric encryption is not recommended
+because it has a lot of overhead associated with transfering large
+quantities of data. We recommend an asymmetric handshake configuration
+if encryption is required.
+
+JavaByte provides the option to encrypt the entire database, or 
+individual tables. The option is provided to encrypt the entire database
+using different keys for each table. You have the ability to generate 
+securely random keys as well as keys securely generated from an 
+administrator provided phase. We recommend that you generate your 
+keys with a randomly generated 256 bit phrase, that you can securley 
+store in the case of a failed attempt to manually modify the file 
+system that results in key corruption. We offer a free tool to generate 
+secure random 256 bit phrases.
+
+We have engineered a proprietary system of encrypting request parameters
+that response times nearly equal to that of unencrypted tables.
+
+-------------------------------------------------------------------------
+
+F. Scripting
+
+We have implemented an advanced scripting service that provides the 
+ablilty to initialize an installation for an application, allows
+automation of small and large batch operations and aids in transitioning
+moving existing data from another datasource into our system.
+
+#########################################################################
+
+2. Deployment
+
+JavaByte is engineered with several deployment options that provide
+a wide support range of configurations and implementations into 
+both new and exsisting production and test enviroments.
+
+-------------------------------------------------------------------------
+
+JavaByte is meant to be easy to use, suitable for administrators with
+very little tech experience, but also has advanced deployment and
+configuration options to suit the needs of both small businesses,
+and also that of large scale enterprise operations.
+
+
+#########################################################################
+
+Section Contents:
+
+		A. Host Operating Systems
+		B. Executable
+			a. Boot Jar
+			b. Application Server
+		C. Routing
+			a. Port Configuration
+			b. SSL
+			c. DNS
+		D. Configuration
+			a. Tables
+			b. System Variables
+			c. Socket Servers
+			d. Debugging
+			e. Client Devices
+
+#########################################################################
+
+A. Host Operating Systems
+
+JavaByte is currently packaged to deploy on all Windows desktop operating
+systems as well as Windows Server 2012 and up.
+JavaByte also supports deployment on any Debian based OS. The system 
+will soon support deployment on other Linux distributions as well
+as Mac OS.
+
+JavaByte requires the 64-bit Java Runtime Enviroment(JRE) to deploy. 
+The JRE can be obtained from:
+https://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html
+
+-------------------------------------------------------------------------
+
+B. Executable
+
+JavaByte is distributed in two different executable packages. One package
+for simple and rapid deployment, and another to offer a much more 
+configurable deployment.
+
+#########################################################################
+
+Sub-Sections:
+	a. Boot Jar
+	b. Application Server
+
+#########################################################################
+
+a. Boot Jar
+
+JavaByte comes packaged as a "Boot Jar" that can rapidly be deployed 
+using provided scripts that can be customized to suit deployment needs,
+as well as exe files for Windows operating systems that can configured
+to launch at OS boot.
+
+The boot jar contains an embedded Apache Tomcat container that is 
+pre-configured at boot time. The boot jar is subject to any and
+all associated Tomcat licenses. All licenses associated with JavaByte
+will be covered in the last section of this document.
+
+The HTTP and HTTPS ports that the boot jar opens on are determined at
+build time, with the default HTTP Port being 7777 and HTTPS port
+being 7743. These ports are chosen to be unlikely to interfere with
+any existing open ports on the host. If you need a boot jar with different
+port configurations, contact us at support@KirchnerBusinessSolutions.com
+
+-------------------------------------------------------------------------
+
+b. Application Server
+
+An alternative package is provided that can be run any application server
+that supports .jar and .war packaged applications. The third party 
+application server will provide avanced port, HTTPS and container 
+configuration options. You will be bound by the license of the application server
+you choose to deploy JavaByte on, as well as our licenses.
+
+-------------------------------------------------------------------------
+
+C. Routing
+
+JavaByte largely utilizes the Transmission Control Protocol(TCP) 
+communication mechanism. TCP allows two networked machines to establish
+a connection and exchange streams of data. TCP guarantees and confirms
+the delivery of data. Network data connections connect on TCP/IP ports.
+
+#########################################################################
+
+Sub-Sections:
+	a. Port Configuration
+	b. SSL
+	c. DNS
+
+#########################################################################
+
+a. Port Configuration
+
+A TCP/IP port consists of sockets. To simplify, the our database would 
+open a Server Socket, and the JavaByte Application Driver would connect
+to the Server Socket with a Client Socket. You could imagine an electri-
+cal wall outlet as a server socket, and the male plug on an electrical 
+cord to be a client socket. When they connect, in the case of the wall
+outlet, the client socket receives energy from the server socket. But in
+the case of networking, when the client connects to the server, the 
+server waits for the the client to send a request over the socket.
+The server then processes the request, and sends the client a response.
+
+Our solution uses a number of TCP/IP ports for various types of commun-
+ication. Including, but not limited to: HTTP(Hyper Text Transmission 
+Protocol), HTTPS(HTTP Secured), Application Driver, etc.
+
+The socket port configuration of the boot jar package is set at build. 
+By default, to hopefully prevent conflicts from other open sockets on
+the host machine, the HTTP port is open on port: 7777 and HTTPS open
+on port 7743. If you would like to use different ports for the boot
+jar package, please contact us at:
+
+support@kirchnerbusinesssolutions.com
+
+The HTTP and HTTPS ports on the application server package are set
+through configuration of the application server, consult your 
+application server documentation for more details.
+
+By default the application driver socket is open on port: 4444 and
+the remote support connection port is open on port: 4333. The ports 
+can be changed in the maintenance console. The remote support connection
+is disabled by default, and should not be enabled without instruction from
+our support team.
+
+-------------------------------------------------------------------------
+
+b. SSL
+
+SSL(Secure Socket Layer) is a type of encryption that is used by the HTTPS
+protocol. SSL requires that the application server host an encryption
+certificate in order to establish and HTTPS connection, by default
+JavaByte is distributed with a secure developer certificate. With
+this type of certificate, when a client connects to the HTTPS port,
+they may receive a warning that the site is insecure(depending on the
+web client). To avoid this, you must obtain a certificate from an
+established SSL authority. They expire in varying timeframes depending
+on the issuing party, and range in price from free to hundreds of USD.
+
+The SSL certificate for the boot jar package is included during build.
+If you require an SSL certificate different from the default, please 
+contact:
+
+support@kirchnerbusinesssolutions.com
+
+The certificate for the application server package can be configured
+through the application server.
+
+-------------------------------------------------------------------------
+
+c. DNS
+
+A DNS(Domain Name Service) server resolves a domain or host name to an
+actual IP address where a TCP/IP socket connecion can be established.
+
+For example, the web server for www.somesite.com might be located at 
+IP address 72.1.1.1. When you type www.somesite.com into the address 
+bar of your web browser, the web browser ask the DNS server to lookup
+the IP address belonging to that domain.
+
+In order to connect to the JavaByte web GUI over the internet by some
+domain or hostname, the HTTP and HTTPS ports must be open to a public
+IP address, and the domain and public address must be registered with
+a public DNS server. Please contact your ISP(Internet Service Provider)
+or domain hosting provider for more details.
+
+#########################################################################
+
+3. User Interface
+
+JavaByte utilizes a web based GUI.  
+
+#########################################################################
+
+Section Contents:
+
+	A. Login Page
+	B. Home Page
+		a. Navigation
+		b. Logout
+	C. User Console
+		a. Active Users
+			I. User Summary
+				I.a. Edit User
+				I.b. Create New User
+			II. Kick User
+		b. User Browser
+		c. User Messaging
+	D. Traffic Console
+	E. Table Console
+		a. Tables Summary
+			I. Active Tables
+			II. Table Status
+		b. Table Query
+
+#########################################################################
+
+A. Login Page
+
+A request to any page if you are not logged in, will always redirect to
+to the login form page. The login form requires a username and password.
+If your credentials are valid, you will be logged on and redirected to 
+the home page.
+
+-------------------------------------------------------------------------
+
+B. Home Page
+
+All pages consist of three main content colums. The left content
+colum shows the logged in username and provides a link to log out.
+
+The middle content page shows the main page contents. The right content
+colum is the navigator. The main content colum on the home page
+contains links to all the functions availible to the user. Clicking
+these links opens the corresponding function in a new window or tab
+depending on your web client configuration.
+
+#########################################################################
+
+Sub-Sections:
+	a. Navigation
+	b. Logout
+
+#########################################################################
+
+a. Navigation
+
+The navigation colum will list your current page in bold text. All other
+navigatable pages will pe listed as links. Opening a page from a navigat-
+or link, will open that page in the current window.
+
+-------------------------------------------------------------------------
+
+b. Logout
+
+In the left content colum, under your username, resides the logout link.
+If you click the logout link, you will be logged out without conformation.
+
+-------------------------------------------------------------------------
+
+C. User Console
+
+The JavaByte user console provides a fluid means of managing both active
+and inactive users through a tabbed interface. 
+
+#########################################################################
+
+Sub-Sections:
+	a. Active Users
+		I. User Summary
+			I.a. Edit User
+			I.b. Create New User
+		II. Kick User
+	b. User Browser
+	c. User Messaging
+
+#########################################################################
+
+a. Active Users
+
+The active users tab is the landing of the user console page. The active
+user tab list all active users in order of the oldest session down.
+The active user table presents all user data including current IP addre-
+ss, session type and device type. There are also User Summary and Kick 
+User buttons.
+
+#########################################################################
+
+Sub-Sections:
+
+	I. User Summary
+		I.a. Edit User
+		I.b. Create New User
+	II. Kick User
+
+
+#########################################################################
+
+I. User Summary
+
+Upon clicking the User Summary button, the user summary page will open
+in a new browser tab. This page will display all user data, including
+session data if they currently in an active state.
+
+In the left content colum, there will be a Create New User button.
+In the main content columm there will be an edit user button under
+the user information. Both of these buttons will open there corr-
+esponding functions in the same browser tab.
+
+I.a. Edit User
+
+The edit user page will allow you to edit subjects user, first name, last
+name, ID and admin status.
+
+At the bottom of the page, you can also resest the subjects password.
+Upon submission of changes, you be redirected back to the subjects
+users summary page.
+
+-------------------------------------------------------------------------
+
+I.b. Create New User
+
+When launching the create new user button, the function will load in
+a new browser tab. You must assign a username, firstname, lastname,
+ID, password and admin status.
+
+When submitting the create new user form, the application will verify
+that the username and ID are not already in use, and also very the
+format of the password. If the submission is successful, you will
+be redirected to the new user's summary page.
+
+-------------------------------------------------------------------------
+
+II. Kick User
+
+When launching the kick user function, you will be prompted with a 
+dialog to confirm the action. The user will be logged out, and their 
+session invalidated. They will then be redirected to the login form
+page. 
+
+-------------------------------------------------------------------------
+
+b. User Browser
+
+The user browser tab provides user detail filters. If the filters are
+all left blank, the browser will populate the result table will all
+users in the database. Otherwise the results will be populated by
+all users matching filters.
+
+-------------------------------------------------------------------------
+
+c. User Messaging
+
+The user messaging tab will contain the active user table. Click the sel-
+ect button for each user you wish to message. You can then type your mes-
+sage into the provided input box. When you click the send button, the
+message will be pushed to all selected users.
+
+-------------------------------------------------------------------------
+
+D. Traffic Console
+
+The traffic console is a portal to view all inbound HTTP/HTTPS traffic. 
+
+-------------------------------------------------------------------------
+
+E. Table Console
+
+The table console allows you to view currently active table summaries
+as well as query their contents.
+
+#########################################################################
+
+Sub-Sections:
+	a. Tables Summary
+		I. Active Tables
+		II. Table Status
+	b. Table Query
+
+#########################################################################
+
+-------------------------------------------------------------------------
+
+4. Client API
+
+#########################################################################
+
+Sub-Sections:
+	A. Single Client
+	b. 
+
+#########################################################################
+
+a. Port Configuration
+
+
+
+-------------------------------------------------------------------------
+
+b. SSL
+
+
+
+-------------------------------------------------------------------------

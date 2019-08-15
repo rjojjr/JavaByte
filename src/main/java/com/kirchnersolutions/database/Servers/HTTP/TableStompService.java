@@ -43,6 +43,26 @@ public class TableStompService {
         this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", result, createHeaders(request.getSessionid()));
     }
 
+    void createTable(StompTableRequest request) throws Exception{
+        debuggingService.stompDebug("@Stomp User " + request.getUsername() + " session id " + request.getSessionid() + " request to create table " + request.getTablename());
+        WebSession session = (WebSession)sessionService.getSessionByUsername(request.getUsername());
+        if(session != null){
+            Transaction transaction = new Transaction();
+            transaction.setUsername(request.getTablename());
+            transaction.setRequestTime(System.currentTimeMillis());
+            transaction.setOperation("CREATE TABLE " + request.getTablename() + " " + request.getQuery());
+            transactionService.submitTransaction(transaction, session);
+            if(transaction.isSuccessfull()){
+                this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "10", createHeaders(request.getSessionid()));
+            }else {
+                this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "3%System%Operation failed", createHeaders(request.getSessionid()));
+            }
+        }else{
+            this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "3%System%Operation failed", createHeaders(request.getSessionid()));
+        }
+
+    }
+
     void queryTable(StompTableRequest request) throws Exception{
         String result = "";
         boolean first = true;

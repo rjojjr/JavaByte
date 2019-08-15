@@ -19,7 +19,7 @@ buildscript {
 	}
 	dependencies {
 		classpath 'org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}'
-		classpath "io.freefair.gradle:lombok-plugin:3.6.6"
+		classpath "io.freefair.gradle:lombok-plugin:3.8.4"
 	}
 }
 
@@ -28,6 +28,7 @@ buildscript {
 plugins {
 	id 'org.springframework.boot' version '2.1.1.RELEASE'
 	id 'java'
+	id "io.freefair.lombok" version "3.8.4"
 }
 
 apply plugin: 'org.springframework.boot'
@@ -35,7 +36,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: "io.freefair.lombok"
 
 group = 'com.kirchnersolutions'
-version = '1.0.14a'
+version = '1.0.16a'
 sourceCompatibility = '1.8'
 
 if (!hasProperty('mainClass')) {
@@ -77,6 +78,7 @@ dependencies {
 	//compile name: 'slf4j-simple-1.7.26'
 	compile("net.java.dev.jna:jna:5.3.1")
 	compile("net.java.dev.jna:jna-platform:5.3.1")
+	//compile("io.freefair.gradle:lombok-plugin:3.6.6")
 }
 
 dependencyManagement {

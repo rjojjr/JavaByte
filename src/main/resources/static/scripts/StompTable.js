@@ -9,6 +9,10 @@ var first = 0, firstt = 0;
 
 var tableName = "";
 
+var create = "";
+
+var createCount = 0;
+
 function showQuery() {
     showTabS("#query")
 }
@@ -43,6 +47,56 @@ function queryTable() {
 
         }
         tableRequest(request);
+    }
+}
+
+function addField() {
+    table = document.getElementById("tableCreate");
+    if(createCount == 0){
+        tableName = table.rows[0].cells[1].children[0].value;
+        create = table.rows[1].cells[1].children[0].value + "-" + table.rows[1].cells[2].children[0].value;
+        var newRow = table.insertRow(2);
+        newRow.innerHTML = ' <td>\n' +
+            '                                        <p>Column</p>\n' +
+            '                                    </td>\n' +
+            '                                    <td>\n' +
+            '                                        <input id=\'field1\' type="text" value="" style="" placeholder="Column Name"/>\n' +
+            '                                    </td>\n' +
+            '                                    <td>\n' +
+            '                                        <input id=\'type1\' type="text" value="" style="" placeholder="Column Type(i = integer, d = decimal, s = string, b = boolean)"/>\n' +
+            '                                    </td>\n' +
+            '                                    <td>\n' +
+            '                                        <button onclick="addField()">\n' +
+            '                                            Add Column\n' +
+            '                                        </button>\n' +
+            '                                    </td>';
+        createCount++;
+    }else{
+        create+= ";" + table.rows[createCount + 1].cells[1].children[0].value + "-" + table.rows[1].cells[2].children[0].value;
+        var newRow = table.insertRow(createCount + 2);
+        newRow.innerHTML = ' <td>\n' +
+            '                                        <p>Column</p>\n' +
+            '                                    </td>\n' +
+            '                                    <td>\n' +
+            '                                        <input id=\'field1\' type="text" value="" style="" placeholder="Column Name"/>\n' +
+            '                                    </td>\n' +
+            '                                    <td>\n' +
+            '                                        <input id=\'type1\' type="text" value="" style="" placeholder="Column Type(i = integer, d = decimal, s = string, b = boolean)"/>\n' +
+            '                                    </td>\n' +
+            '                                    <td>\n' +
+            '                                        <button onclick="addField()">\n' +
+            '                                            Add Column\n' +
+            '                                        </button>\n' +
+            '                                    </td>';
+        createCount++;
+    }
+}
+
+function createTable() {
+    if(tableName != "" && create != ""){
+        sendNewTable();
+    }else{
+        alert("Invalid Parameters");
     }
 }
 
@@ -153,6 +207,7 @@ var connect_callback = function () {
             location.href = "/"
         }
         if (msg[0] == 10) {
+            location.href = "/tables"
         }
         if (msg[0] == "stat") {
             var rowst = "";
@@ -213,6 +268,11 @@ function tableSummary(tablename) {
 function tableRequest(request) {
     stompClient.send("/app/table/query", {},
         JSON.stringify({'username': username, 'session': sessionId, 'tablename': tableName, 'query': request}));
+}
+
+function sendNewTable() {
+    stompClient.send("/app/table/create", {},
+        JSON.stringify({'username': username, 'session': sessionId, 'tablename': tableName, 'query': create}));
 }
 
 function sendDeviceCert(cert) {

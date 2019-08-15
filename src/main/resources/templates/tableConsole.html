@@ -50,6 +50,7 @@
             <ul id="tabs">
                 <li><a href="#sum">Tables Summary</a></li>
                 <li><a href="#query">Table Query</a></li>
+                <li><a href="#create">Create Table</a></li>
             </ul>
             <div class="tabContent" id="sum">
                 <div id="sum-container">
@@ -124,7 +125,52 @@
                     </div>
                 </div>
             </div>
+            <div class="tabContent" id="create">
+                <div id="create-container">
+                    <div id="createtables-conatiner">
+                        <h2>Create Table</h2>
+                        <hr>
+                        <div id="createtable-table">
+                            <table id='tableCreate' style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                                   border="1" cellpadding="2"
+                                   cellspacing="2">
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <p>Table Name</p>
+                                    </td>
+                                    <td>
+                                        <input id='tablename' type="text" value="" style=""/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>Column</p>
+                                    </td>
+                                    <td>
+                                        <input id='field' type="text" value="" style="" placeholder="Column Name"/>
+                                    </td>
+                                    <td>
+                                        <input id='type' type="text" value="" style="" placeholder="Column Type(i = integer, d = decimal, s = string, b = boolean)"/>
+                                    </td>
+                                    <td>
+                                        <button onclick="addField()">
+                                            Add Column
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="text-align: center">
+                            <button onclick="createTable()">
+                                Add Column
+                            </button>
+                        </div>
 
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="col3">
             <h2>Navagation</h2>

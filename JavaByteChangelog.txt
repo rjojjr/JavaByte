@@ -1,0 +1,254 @@
+JavaByte Modern Database Changelog
+
+2019 Kirchner Solutions
+
+08/14/2019
+1.0.16a
+#########################################################################
+Build 21102
+	Started create table function to table console.
+
+#########################################################################
+
+07/30/2019
+1.0.15a
+#########################################################################
+Build 21101
+	Improved socket encoding.
+
+#########################################################################
+
+07/28/2019
+1.0.14a
+#########################################################################
+Build 21102
+	Improved socket encoding.
+
+#########################################################################
+
+07/22/2019
+1.0.13a
+#########################################################################
+Build 21100
+	Compliance fixes.
+	Security improvements.
+
+Build 21101
+	Expression parsing improvements.
+
+Build 21102
+	Improved socket encoding.
+
+#########################################################################
+
+07/16/2019
+1.0.12a
+#########################################################################
+Build 21090
+	Rough socket service impl.
+	Added socket server tab to maintenance console.
+
+Build 21091
+	Added confirm to dump logs in log console and
+		traffic console.
+	Socket server bug fix.
+
+Build 21092
+	Optimization and performance improvements.
+	Fixed transaction serial bug.
+
+#########################################################################
+
+07/14/2019
+1.0.11a
+#########################################################################
+Build 21080
+	Fixed table console status bug.
+	Added invalidate all active sessions on shutdown.
+	Fixed user logging bug.
+
+Build 21081
+	Fixed session persistance bug.
+	Code performance optimizations.
+
+Build 21082
+	Configuration improvements.
+
+#########################################################################
+
+07/13/2019
+1.0.10a
+#########################################################################
+Build 21070
+	Implemented set configuration variables in
+		maintenance console.
+	Impoved user input error handling.
+
+Build 21071
+	Added rough Traffic log dump.
+	Added rough log console dumps. 
+	Improved log console.
+
+Build 21072
+	Show log results in order from most recent.
+
+#########################################################################
+
+07/09/2019
+1.0.09a
+#########################################################################
+Build 21060
+	Improvements to stomp security.
+	Added page redirect to stomp requests denied
+		due to lack of privilege.
+	Enhanced logging in DebuggingService.
+	Changed global anchor style.
+
+Build 21061
+	Imp. rough log console.
+	Fixed session timeout bugs.
+
+Build 21062
+	Client js memory improvements.
+	Fixed kick user.
+	Device logging improvements.
+	Exception handling improvements.
+
+Build 21063
+	Fixed stomp authentication bug.
+	Added Query Table button to table console stat table.
+	Improve stomp debug logging.
+	Added device type to active user list.
+
+#########################################################################
+
+07/07/2019
+1.0.08a
+#########################################################################
+Build 21050
+	Request Configuration Settings Imp.
+	Added rough colum header to table query results.
+	Clear table query results when new table is selected.
+	Added ping check every 4 seconds in maint. console.
+	Fixed session timeout bug.
+
+Build 21051
+	Start rough transaction console imp.
+	Added time stamp to debug logs.
+	Set ping counter to 2 seconds.
+	Changed transaction serial encoding.
+	Improved file locking mechanisms.
+
+Build 21052
+	Partially added tab redirects.
+	Fixed session persistence bug.
+
+#########################################################################
+
+07/05/2019
+1.0.07a
+#########################################################################
+Build 21040
+	Added DocumentService.
+	Added changelog tab to maint. console.
+
+Build 21041
+	Added documentation tab to maint. console.
+
+#########################################################################
+
+07/01/2018
+1.0.06a
+#########################################################################
+Build 21030
+	Added populate table query filters when active table is selected.
+	Finished rough table console table query.
+	Fixed serialization bugs.
+	Fixed transaction index bug.
+
+#########################################################################
+
+06/28/2019
+1.0.05a:
+#########################################################################
+Build 21020
+	Added disk stats to system status page.
+	Fixed bug when user browser search results would
+		not refresh after first search.
+
+Build 21021
+	Fixed error when user browser search returns no results.
+	Fixed edit user bug.
+
+Build 21022
+	Performance improvements.
+
+#########################################################################
+
+06/27/2019
+1.0.04a:
+#########################################################################
+Build 21010
+	Fixed send user message bug.
+	User console message recipient list cleared after
+		a message is sent.
+	Added initial Table Console implementation.
+
+Build 21011
+	Adjusted table info to show current next index instead
+		 of last used index.
+	Fixed transaction index bug by adding setNextIndex 
+		to table container.
+	Fixed undefined row on maintenance stat table on machine
+		with two CPUs.
+
+#########################################################################
+
+06/19/2019
+1.0.03a:
+#########################################################################
+Build 21002
+	Added log session off on httpsession destroyed event.
+	Changed System Stats refresh rate to 4 seconds.
+	Changed booleans in bench to AtomicBoolean.
+	Fixed bench to increase score for lower time.
+	Added cookie method to HTTPController to maintain
+		session state for redirected requests.
+
+Build 21003
+	Added initial table stomp controller and service.
+	Added table console page.
+
+#########################################################################
+
+06/17/2019
+1.0.02a:
+#########################################################################
+Build 21001
+	Added static resource versioning to break client cache.
+	Added reset password function to edit user page.
+	Added construction page to unfinished pages.
+	Added DebuggingService.
+	Added shutdown and reboot functions to maintenance console.
+	Updated benchmark to include integer math and adjusted the score 
+		to account for number of threads.
+	Added iplogger.
+
+#########################################################################
+
+06/14/2019
+1.0.01a:
+#########################################################################
+Build 21000
+	Added rough socket server imp.
+	Added Tabbed user console.
+	Added PageCSV thread.
+	Added BackupService.
+
+#########################################################################
+
+06/10/2019
+1.0.00a:
+#########################################################################
+Build 20000
+	Initial alpha build.

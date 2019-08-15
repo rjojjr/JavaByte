@@ -136,6 +136,11 @@ public class GeneralStompController {
         tableStompService.queryTable(request);
     }
 
+    @MessageMapping("/table/create")
+    public void createTable(StompTableRequest request) throws Exception{
+        tableStompService.createTable(request);
+    }
+
     @MessageMapping("/table/info")
     public void getTableInfo(StompTableRequest request){
         tableStompService.getTableInfo(request);
