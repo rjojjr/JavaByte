@@ -48,7 +48,7 @@ public class TableStompService {
         WebSession session = (WebSession)sessionService.getSessionByUsername(request.getUsername());
         if(session != null && session.getUser().getDetail("admin").contains("t")){
             Transaction transaction = new Transaction();
-            transaction.setUsername(request.getTablename());
+            transaction.setUsername(request.getUsername());
             transaction.setRequestTime(System.currentTimeMillis());
             transaction.setOperation("CREATE TABLE " + request.getTablename() + " " + request.getQuery());
             transactionService.submitTransaction(transaction, session);

@@ -8,6 +8,7 @@ JavaByte Modern Database Changelog
 Build 21102
 	Started create table function to table console.
 	Websocket security improvements.
+	Fixed UI create table transaction bug.
 
 #########################################################################
 
