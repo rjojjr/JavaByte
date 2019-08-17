@@ -136,6 +136,16 @@ public class GeneralStompController {
         tableStompService.queryTable(request);
     }
 
+    @MessageMapping("/table/query/record")
+    public void getRow(StompTableRequest request) throws Exception{
+        tableStompService.queryRecord(request);
+    }
+
+    @MessageMapping("/table/commit/record")
+    public void commit(StompTableRequest request) throws Exception{
+        tableStompService.commit(request);
+    }
+
     @MessageMapping("/table/create")
     public void createTable(StompTableRequest request) throws Exception{
         tableStompService.createTable(request);

@@ -14,7 +14,7 @@ import java.io.File;
 public class SysVars {
 
     public static final String VERSION = "1.0.16a";
-    public static final String BUILD = "21102";
+    public static final String BUILD = "21106";
     public static final String OS = "WIN";
     //public static final String OS = "LIN";
 

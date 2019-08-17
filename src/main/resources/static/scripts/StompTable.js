@@ -13,8 +13,10 @@ var create = "";
 
 var createCount = 0;
 
+var currentindex = 0;
+
 function showQuery() {
-    showTabS("#query")
+    showTabS("#query");
 }
 
 function setUname(Uname) {
@@ -92,6 +94,62 @@ function addField() {
     }
 }
 
+function editRow(index){
+    document.getElementById("prompt").innerText = "";
+    currentindex = index;
+    table = document.getElementById("tableEdit");
+    deleteTable(table);
+    var request = "index;" + index;
+    rowRequest(request);
+}
+
+function popEdit(results) {
+    showTabS("#edit");
+    table = document.getElementById("tableEdit");
+    var rows = results.split(";");
+    var fields = rows[0].split(":");
+    var vals = rows[1].split(":");
+    for (var i = 0; i < fields.length; i++) {
+        var newRow = table.insertRow(i);
+        var cell = newRow.insertCell(0);
+        cell.innerText = fields[i];
+        cell = newRow.insertCell(1);
+        if(fields[i] == "index"){
+            cell.innerText = vals[i];
+        }else{
+            cell.innerHTML= '<input class="filterInput" type="text" value=""/>'
+            table.rows[i].cells[1].children[0].value = vals[i];
+        }
+
+    }
+}
+
+function commitChange() {
+    table = document.getElementById("tableEdit");
+    var request;
+    var first = true;
+    for(var i = 1; i < table.rows.length; i++){
+        if(first){
+            var temp = table.rows[i].cells[0].innerText;
+            if(temp == "index"){
+                request = temp + ":" + table.rows[i].cells[1].innerText;
+            }else{
+                request = temp + ":" + table.rows[i].cells[1].children[0].value;
+            }
+            first = false;
+        }else{
+            var temp = table.rows[i].cells[0].innerText;
+            if(temp == "index"){
+                request+= ";" + temp + ":" + table.rows[i].cells[1].innerText;
+            }else{
+                request+= ";" + temp + ":" + table.rows[i].cells[1].children[0].value;
+            }
+        }
+    }
+    deleteTable(document.getElementById("tableresult"));
+    commit(request);
+}
+
 function createTable() {
     if(tableName != "" && create != ""){
         sendNewTable();
@@ -103,14 +161,32 @@ function createTable() {
 function populateResultTable(results) {
     table = document.getElementById("tableresult");
     deleteTable(table);
+    var index
+    var record
     var rows = results.split(";");
+    var count;
     for (var i = 0; i < rows.length; i++) {
         var newRow = table.insertRow(i);
         var cells = rows[i].split(':');
         for (var k = 0; k < cells.length; k++) {
             var cell = newRow.insertCell(k);
             cell.innerText = cells[k];
+            if(i == 0 && cells[k] == "index"){
+                index = k;
+            }
+            if(i > 0 && k == index){
+                record = cells[k];
+            }
+            count = k;
         }
+        if(i != 0){
+            var cell = newRow.insertCell(count + 1);
+            cell.innerHTML= '<button type="button" onclick="editRow(' + record + ')">Edit Row</button>';
+        }else{
+            var cell = newRow.insertCell(count + 1);
+            cell.innerText = "Edit Record";
+        }
+
     }
 }
 
@@ -228,6 +304,9 @@ var connect_callback = function () {
             alert(msg);
             location.href = "/";
         }
+        if (msg[0] == "record") {
+            popEdit(msg[1]);
+        }
     });
     sendUsername();
 };
@@ -267,6 +346,16 @@ function tableSummary(tablename) {
 
 function tableRequest(request) {
     stompClient.send("/app/table/query", {},
+        JSON.stringify({'username': username, 'session': sessionId, 'tablename': tableName, 'query': request}));
+}
+
+function rowRequest(request) {
+    stompClient.send("/app/table/query/record", {},
+        JSON.stringify({'username': username, 'session': sessionId, 'tablename': tableName, 'query': request}));
+}
+
+function commit(request) {
+    stompClient.send("/app/table/commit/record", {},
         JSON.stringify({'username': username, 'session': sessionId, 'tablename': tableName, 'query': request}));
 }
 

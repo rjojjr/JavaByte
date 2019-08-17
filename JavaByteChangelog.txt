@@ -5,17 +5,21 @@ JavaByte Modern Database Changelog
 08/14/2019
 1.0.16a
 #########################################################################
-Build 21102
+Build 21105
 	Started create table function to table console.
 	Websocket security improvements.
 	Fixed UI create table transaction bug.
+
+Build 21106
+	Started Table Console Edit record.
+	Added Linux system stats.
 
 #########################################################################
 
 07/30/2019
 1.0.15a
 #########################################################################
-Build 21101
+Build 21104
 	Improved socket encoding.
 
 #########################################################################
@@ -23,7 +27,7 @@ Build 21101
 07/28/2019
 1.0.14a
 #########################################################################
-Build 21102
+Build 21103
 	Improved socket encoding.
 
 #########################################################################

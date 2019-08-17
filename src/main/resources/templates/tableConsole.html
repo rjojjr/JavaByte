@@ -51,6 +51,7 @@
                 <li><a href="#sum">Tables Summary</a></li>
                 <li><a href="#query">Table Query</a></li>
                 <li><a href="#create">Create Table</a></li>
+                <li><a href="#edit">Edit Record</a></li>
             </ul>
             <div class="tabContent" id="sum">
                 <div id="sum-container">
@@ -168,6 +169,33 @@
                             </button>
                         </div>
 
+                    </div>
+                </div>
+            </div>
+            <div class="tabContent" id="edit">
+                <div id="edit-container">
+                    <div id="editrecord-conatiner">
+                        <h2>Edit Record</h2>
+                        <hr>
+                        <p id="prompt">Please select a record from table query</p>
+                        <div id="activeuser-table">
+                            <table id='tableEdit' style="border-collapse:collapse; align: center; text-align: left; align: center; width: 100%;"
+                                   border="1" cellpadding="2"
+                                   cellspacing="2">
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="text-align: center">
+                            <button onclick="commitChange()">
+                                Commit Changes
+                            </button>
+                        </div>
+                        <div style="text-align: center">
+                            <button onclick="deleteRecord()">
+                                Delete Record
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

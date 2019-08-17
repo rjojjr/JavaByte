@@ -63,6 +63,37 @@ public class TableStompService {
 
     }
 
+    void commit(StompTableRequest request) throws Exception{
+        debuggingService.stompDebug("@Stomp user " + request.getUsername() + " session id " + request.getSessionid() + " request commit for table " + request.getTablename());
+        WebSession session = (WebSession)sessionService.getSessionByUsername(request.getUsername());
+        Transaction transaction = new Transaction();
+        transaction.setUsername(request.getUsername());
+        transaction.setUserIndex(new BigInteger(session.getUserIndex()));
+        transaction.setOperation("PUT ADVANCED " + request.getTablename());
+        Map<String, String> put = new HashMap<>();
+        Map<String, String> where = new HashMap<>();
+        String[] fields = request.getQuery().split(";");
+        for(String field : fields){
+            String[] vals = field.split(":");
+            if(vals[0].equals("index")){
+                where.put("index", vals[1]);
+            }else{
+                put.put(vals[0], vals[1]);
+            }
+        }
+        transaction.setRequestTime(System.currentTimeMillis());
+        transaction.setPut(put);
+        transaction.setWhere(where);
+        transactionService.submitTransaction(transaction, session);
+        if(transaction.isSuccessfull()){
+            debuggingService.stompDebug("@Stomp user " + request.getUsername() + " session id " + request.getSessionid() + " request commit for table " + request.getTablename() + " sucessfull.");
+            this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "3%System%Commit Successful", createHeaders(request.getSessionid()));
+        }else{
+            debuggingService.stompDebug("@Stomp user " + request.getUsername() + " session id " + request.getSessionid() + " request commit for table " + request.getTablename() + " Unsuccessful.");
+            this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "3%System%Commit Unsuccessful", createHeaders(request.getSessionid()));
+        }
+    }
+
     void queryTable(StompTableRequest request) throws Exception{
         String result = "";
         boolean first = true;
@@ -115,6 +146,67 @@ public class TableStompService {
                 }
             }
             result = "result%" + result;
+            debuggingService.stompDebug("@Stomp user " + request.getUsername() + " session id " + request.getSessionid() + " request query for table " + request.getTablename() + " sucessfull.");
+            this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", result, createHeaders(request.getSessionid()));
+        }else{
+
+            debuggingService.stompDebug("@Stomp user " + request.getUsername() + " session id " + request.getSessionid() + " request query for table " + request.getTablename() + " unsucessfull " + res.getMessage());
+            this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", "result%" + res.getMessage(), createHeaders(request.getSessionid()));
+        }
+    }
+
+    void queryRecord(StompTableRequest request) throws Exception{
+        String result = "";
+        boolean first = true;
+        debuggingService.stompDebug("@Stomp user " + request.getUsername() + " session id " + request.getSessionid() + " request record for table " + request.getTablename());
+        WebSession session = (WebSession)sessionService.getSessionByUsername(request.getUsername());
+        Transaction transaction = new Transaction();
+        transaction.setUsername(request.getUsername());
+        transaction.setUserIndex(new BigInteger(session.getUserIndex()));
+        Map<String, String> where = new HashMap<>();
+        if(!request.getQuery().equals("all")){
+            String[] fields = request.getQuery().split("%");
+            for(String field : fields){
+                String[] temp = field.split(";");
+                where.put(temp[0], temp[1]);
+            }
+        }
+        transaction.setOperation("SELECT ADVANCED " + request.getTablename());
+        transaction.setWhere(where);
+        transaction.setHowMany(new BigInteger("-1"));
+        //
+        DatabaseResults res = (DatabaseResults)databaseObjectFactory.databaseObjectFactory(transactionService.submitTransaction(transaction, session));
+        //System.out.println(res.getMessage());
+        if(res.isSuccess()){
+            for(Map<String, String> map : res.getResults()){
+                String temp = "";
+                boolean tfirst = true;
+                if(first){
+                    for(String key : map.keySet()){
+                        if(tfirst){
+                            result = key;
+                            temp = map.get(key);
+                            tfirst = false;
+                        }else{
+                            result+= ":" + key;
+                            temp+= ":" + map.get(key);
+                        }
+                    }
+                    result+= ";" + temp;
+                    first = false;
+                }else{
+                    for(String key : map.keySet()){
+                        if(tfirst){
+                            temp = map.get(key);
+                            tfirst = false;
+                        }else{
+                            temp+= ":" + map.get(key);
+                        }
+                    }
+                    result+= ";" + temp;
+                }
+            }
+            result = "record%" + result;
             debuggingService.stompDebug("@Stomp user " + request.getUsername() + " session id " + request.getSessionid() + " request query for table " + request.getTablename() + " sucessfull.");
             this.simpMessagingTemplate.convertAndSendToUser(request.getSessionid(), "/queue/notify", result, createHeaders(request.getSessionid()));
         }else{

@@ -187,7 +187,7 @@ function getNum() {
 }
 
 function dumpLogs() {
-    var conf = confirm("aRE YOU SURE YOU WANT TO DUMP TRAFFIC LOGS?");
+    var conf = confirm("Are you sure that you want to dump traffic logs?");
     if(conf){
         stompClient.send("/app/traffic/dump", {},
             JSON.stringify({'username':username, 'session':sessionId}));
