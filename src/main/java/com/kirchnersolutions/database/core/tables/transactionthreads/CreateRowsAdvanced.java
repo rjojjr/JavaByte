@@ -23,7 +23,7 @@ class CreateRowsAdvanced implements Callable<Transaction> {
     public Transaction call() throws Exception {
         Thread.currentThread().setName("Transaction " + transaction.getTransactionID() + ":CreateRowsAdvanced:");
         List<String> expression = new ArrayList<>(Arrays.asList(transaction.getOperation().split(" ")));
-        List<String> rules = new ArrayList<>(Arrays.asList(expression.get(4).split(":")));
+        List<String> rules = new ArrayList<>(Arrays.asList(expression.get(3).split(":")));
         if (rules.size() == 1 || rules.get(1).equals(new String(""))) {
             try {
                 if (tableManagerService.createRows(transaction.getNewRows(), rules.get(0))) {

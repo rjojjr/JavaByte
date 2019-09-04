@@ -1,13 +1,13 @@
 /*
- * kData Performance Database
- *
+ * kData Performance Database 
+ * 
  * Version: 1.0.00b
- *
+ * 
  * Robert Kirchner Jr.
  * 2018 Kirchner Solutions
- *
+ * 
  * This code is not to be distributed, compiled, decompiled
- * copied, used, recycled, moved or modified in any way without
+ * copied, used, recycled, moved or modified in any way without 
  * express written permission from Kirchner Solutions
  */
 package com.kirchnersolutions.database.Servers.socket;
@@ -41,23 +41,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ *
  * MultiClientServer Version 1.0.00b
  *
  * @author Robert Kirchner Jr. 2018 Kirchner Solutions
  */
-@DependsOn({"threadPoolTaskExecutor", "debuggingService", "transactionService", "sessionService"})
-@Component
 public class MultiClientServer {
 
-    @Autowired
     private volatile ThreadPoolTaskExecutor threadPoolTaskExecutor;
-    @Autowired
+    private volatile TransactionService transactionService;
+    private TransactionSerializer transactionSerializer;
+    private volatile SessionService sessionService;
     private DebuggingService debuggingService;
-    @Autowired
-    private SessionService sessionService;
-    @Autowired
-    private TransactionService transactionService;
-    @Autowired
     private DatabaseObjectFactory databaseObjectFactory;
 
     private volatile int port = 0;
@@ -66,74 +61,68 @@ public class MultiClientServer {
 
     private static volatile MultiClientServer single_insatance = null;
 
-    public MultiClientServer() throws Exception {
-
-    }
-
-    @PostConstruct
-    public void init() throws Exception{
-        System.out.println("Socket Server created");
+    private MultiClientServer(ThreadPoolTaskExecutor threadPoolTaskExecutor, TransactionService transactionService, TransactionSerializer transactionSerializer,
+                             SessionService sessionService, DebuggingService debuggingService, DatabaseObjectFactory databaseObjectFactory) throws Exception{
+        this.threadPoolTaskExecutor = threadPoolTaskExecutor;
+        System.out.println("Server bean created");
+        this.transactionService = transactionService;
+        this.transactionSerializer = transactionSerializer;
+        this.databaseObjectFactory = databaseObjectFactory;
+        this.sessionService = sessionService;
+        this.debuggingService = debuggingService;
         this.port = debuggingService.getSocketPort();
-        server = new SocketServer(new ServerSocket(), threadPoolTaskExecutor, debuggingService, sessionService, databaseObjectFactory, transactionService, port, running);
-        start();
+        server = new SocketServer(new ServerSocket(), threadPoolTaskExecutor, transactionService, transactionSerializer,
+               sessionService, debuggingService, databaseObjectFactory, port, running);
+        //start();
+
     }
 
+    public static MultiClientServer getInstance(ThreadPoolTaskExecutor threadPoolTaskExecutor, TransactionService transactionService, TransactionSerializer transactionSerializer,
+                              SessionService sessionService, DebuggingService debuggingService, DatabaseObjectFactory databaseObjectFactory) throws Exception{
+        if(single_insatance == null){
+            single_insatance = new MultiClientServer(threadPoolTaskExecutor, transactionService, transactionSerializer,
+                    sessionService, debuggingService, databaseObjectFactory);
+        }
+        return single_insatance;
+    }
 
-    public synchronized boolean isRunning() {
+    public synchronized boolean isRunning(){
         return server.isRunning();
     }
 
-    void manualStart() throws Exception {
-        if (!isRunning()) {
+   void manualStart() throws Exception{
+        if(!isRunning()){
             threadPoolTaskExecutor.execute(server);
         }
     }
 
-    public boolean start() throws Exception {
-        if (!isRunning()) {
+    public void start() throws Exception{
+        if(!isRunning()){
             ///threadPoolTaskExecutor.execute(server);
-            try {
+            try{
                 threadPoolTaskExecutor.execute(server);
                 running.set(true);
                 //threadPoolTaskExecutor.execute(new SocketServer(new ServerSocket(), threadPoolTaskExecutor, transactionService, transactionSerializer,
-                //sessionService, debuggingService, databaseObjectFactory, port, running));
-                return true;
-            } catch (Exception e) {
+                       //sessionService, debuggingService, databaseObjectFactory, port, running));
+            }catch (Exception e){
                 running.set(false);
                 debuggingService.socketDebug(e.getMessage());
                 debuggingService.nonFatalDebug(debuggingService.getStack(e));
-                return false;
             }
-        }
-        return false;
-    }
 
-
-    public String getStats() {
-        try{
-            if(isRunning()){
-                return "true," + getPort();
-            }else {
-                // multiClientServer.manualStart();
-                return "false";
-
-            }
-        }catch (Exception e){
-            return e.getMessage();
         }
     }
 
-    public boolean stop() throws Exception {
-        if (isRunning()) {
+    void stop() throws Exception{
+        if(isRunning()){
             server.stop();
-            return true;
         }
-        return false;
     }
 
-    int getPort() {
+    int getPort(){
         return port;
     }
+
 
 
 }

@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ *
  * @author rjojj
  */
 class IndependentClientHandler implements Runnable {
@@ -33,23 +34,29 @@ class IndependentClientHandler implements Runnable {
     private Socket clientSocket;
     private BufferedWriter out;
     private BufferedReader in;
+    
 
+    private TransactionService transactionService;
+    private TransactionSerializer transactionSerializer;
     private DebuggingService debuggingService;
+    private DatabaseObjectFactory databaseObjectFactory;
 
     private SocketSession session;
-
-    private SocketServer socketServer;
+    private SessionService sessionService;
 
     private volatile boolean loggedOn = false;
     private String userName = "";
 
     private boolean stop;
 
-    public IndependentClientHandler(Socket socket, SocketSession session, DebuggingService debuggingService, SocketServer socketServer) {
+    public IndependentClientHandler(Socket socket, TransactionService transactionService, TransactionSerializer transactionSerializer, SocketSession session, DebuggingService debuggingService, SessionService sessionService, DatabaseObjectFactory databaseObjectFactory) {
         this.clientSocket = socket;
+        this.transactionService = transactionService;
+        this.transactionSerializer = transactionSerializer;
+        this.databaseObjectFactory = databaseObjectFactory;
         this.session = session;
-        this.socketServer = socketServer;
         this.debuggingService = debuggingService;
+        this.sessionService = sessionService;
         //System.out.println("here");
         stop = false;
     }
@@ -68,8 +75,8 @@ class IndependentClientHandler implements Runnable {
 
     @Override
     public void run() {
-        String ip = clientSocket.getRemoteSocketAddress().toString().split("/")[1];
-        int port = clientSocket.getPort();
+    String ip = clientSocket.getRemoteSocketAddress().toString();
+    int port = clientSocket.getPort();
         Thread.currentThread().setName("SocketSession port " + port + " address " + ip);
         session.setIp(ip);
         session.setPort(port);
@@ -77,7 +84,7 @@ class IndependentClientHandler implements Runnable {
         dev.setIp(ip);
         dev.setType("socket");
         session.setDevice(dev);
-        debuggingService.socketDebug("Socket client connected on port " + port + " address " + ip);
+        debuggingService.socketDebug("Socket client connected on port " + port);
         //transMan = TransactionManager.getInstance();
         try {
             out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
@@ -98,48 +105,41 @@ class IndependentClientHandler implements Runnable {
         try {
             while ((inputLine = in.readLine()) != null) {
                 //debuggingService.socketDebug("Input: " + inputLine);
-                //System.out.println("here");
-                if (session.getUser() != null) {
+                if(session.getUser() != null){
                     dev.setUsername(session.getUser().getDetail("username"));
-                    debuggingService.socketDebug("Socket request received from " + dev.getUsername() + " on port " + port + " address " + ip);
-                } else {
-                    debuggingService.socketDebug("Socket request received from null " + "on port " + port + " address " + ip);
                 }
-                String output = socketServer.processInput(inputLine, session);
-                if (session == null) {
-                    out.write("-close");
-                    out.flush();
-                    break;
-                } else {
-                    output = new String(Base64.getEncoder().encode(output.getBytes("UTF-8")), "UTF-8");
-                    out.write(output + "\n");
-
-                    dev.setUsername(session.getUser().getDetail("username"));
-                    out.flush();
-                    debuggingService.socketDebug("Socket request received from " + dev.getUsername() + " processed successfully on port " + port + " address " + ip);
-                }
-
+                String output = new String(transactionService.submitTransaction((Transaction)databaseObjectFactory.databaseObjectFactory(Base64.getDecoder().decode(inputLine.getBytes("UTF-8"))), session), "UTF-8");
+                output = new String(Base64.getEncoder().encode(output.getBytes("UTF-8")), "UTF-8");
+                out.write(output + "\n");
+                dev.setUsername(session.getUser().getDetail("username"));
+                out.flush();
                 //debuggingService.socketDebug("Output: " + output);
             }
-            if (session != null) {
-                socketServer.invalidate(session, port);
-                session = null;
+            if(session.getUser() != null){
+                sessionService.logOff(4, session);
             }
             in.close();
             out.close();
         } catch (IOException ex) {
-            try {
-                socketServer.invalidate(session, port);
-            } catch (Exception f) {
+            try{
+                if(session.getUser() != null){
+                    sessionService.logOff(4, session);
+                }
+            }catch (Exception f){
+                debuggingService.socketDebug("Failure to logout socket client on port " + port + " " + f.getMessage());
+                debuggingService.nonFatalDebug("Failure to logout socket client on port " + port + " " + f.getMessage());
             }
             debuggingService.socketDebug("Failure to read client socket input on port " + port + " " + ex.getMessage());
             debuggingService.nonFatalDebug("Failure to read client socket input on port " + port + " " + ex.getMessage());
             Logger.getLogger(MultiClientServer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (Exception es) {
-            try {
-                socketServer.invalidate(session, port);
-            } catch (Exception f) {
-
+        } catch (Exception es){
+            try{
+                if(session.getUser() != null){
+                    sessionService.logOff(4, session);
+                }
+            }catch (Exception f){
+                debuggingService.socketDebug("Failure to logout socket client on port " + port + " " + f.getMessage());
+                debuggingService.nonFatalDebug("Failure to logout socket client on port " + port + " " + f.getMessage());
             }
             es.printStackTrace();
         }
@@ -148,10 +148,13 @@ class IndependentClientHandler implements Runnable {
             clientSocket.close();
             debuggingService.socketDebug("Closed client socket on port " + port);
         } catch (Exception ex) {
-            try {
-                socketServer.invalidate(session, port);
-                session = null;
-            } catch (Exception f) {
+            try{
+                if(session.getUser() != null){
+                    sessionService.logOff(4, session);
+                }
+            }catch (Exception f){
+                debuggingService.socketDebug("Failure to logout socket client on port " + port + " " + f.getMessage());
+                debuggingService.nonFatalDebug("Failure to logout socket client on port " + port + " " + f.getMessage());
             }
             debuggingService.socketDebug("Failure to close client socket input on port " + port + " " + ex.getMessage());
             debuggingService.nonFatalDebug("Failure to close client socket input on port " + port + " " + ex.getMessage());

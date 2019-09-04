@@ -2,6 +2,29 @@ JavaByte Modern Database Changelog
 
 2019 Kirchner Solutions
 
+09040/2019
+1.0.18a
+#########################################################################
+Build 21109
+	Started backup service impl.
+
+#########################################################################
+
+08/30/2019
+1.0.17a
+#########################################################################
+Build 21108
+	Rewrote socket server.
+	Finished Edit Record function.
+	Started insert record impl.
+
+Build 21107
+	Fix socket server bugs.
+	Fixed bug when creating records.
+	Logout socket user on unexpected session end.
+
+#########################################################################
+
 08/14/2019
 1.0.16a
 #########################################################################

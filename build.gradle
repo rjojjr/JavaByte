@@ -36,7 +36,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: "io.freefair.lombok"
 
 group = 'com.kirchnersolutions'
-version = '1.0.16a'
+version = '1.0.18a'
 sourceCompatibility = '1.8'
 
 if (!hasProperty('mainClass')) {
@@ -70,6 +70,9 @@ dependencies {
 	compile 'org.springframework.boot:spring-boot-starter-web'
 	compile 'org.springframework.boot:spring-boot-starter-web-services'
 	compile 'org.springframework.boot:spring-boot-starter-websocket'
+	// https://mvnrepository.com/artifact/org.springframework.integration/spring-integration-core
+	compile group: 'org.springframework.integration', name: 'spring-integration-core', version: '5.1.7.RELEASE'
+
 	//compile 'de.codecentric:spring-boot-admin-starter-server'
 	testCompile 'org.springframework.boot:spring-boot-starter-test'
 	//testCompile 'org.springframework.security:spring-security-test'

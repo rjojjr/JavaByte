@@ -27,7 +27,8 @@ public class Session {
 
     public String getDeviceType(){
         lastActivity = System.currentTimeMillis();
-        return deviceCertificate.getType();
+        //return deviceCertificate.getType();
+        return "null";
     }
 
     public void setDevice(DeviceCertificate deviceCertificate){

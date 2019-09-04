@@ -310,6 +310,7 @@ public class SessionService {
             session = null;
             return true;
         }catch (Exception e){
+            e.printStackTrace();
             debuggingService.throwDevException(new DevelopmentException("Failed to logoff. Session ID: " + session.getSessionIndex() + " " + e.getMessage() + " Class SessionService Method LogOff"));
             debuggingService.nonFatalDebug("Failed to logoff. Session ID: " + session.getSessionIndex() + " " + e.getMessage());
             return false;

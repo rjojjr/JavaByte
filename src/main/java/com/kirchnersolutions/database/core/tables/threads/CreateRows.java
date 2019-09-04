@@ -63,13 +63,14 @@ public class CreateRows implements Callable<AtomicBoolean> {
         if(!rollBackNeeded.get()){
             for(Future<AtomicBoolean> future : futures){
                 try{
-                    if(!future.get().get()){
-                        return rollBackNeeded;
+                    if(future.get().get()){
+                        return new AtomicBoolean(false);
                     }
                 }catch (Exception e){
                     throw e;
                 }
             }
+            return new AtomicBoolean(true);
         }
         return rollBackNeeded;
     }

@@ -3,6 +3,7 @@ package com.kirchnersolutions.database.Servers.HTTP;
 import com.kirchnersolutions.database.Configuration.DeviceConfiguration;
 import com.kirchnersolutions.database.Servers.HTTP.beans.*;
 import com.kirchnersolutions.database.dev.DebuggingService;
+import com.kirchnersolutions.database.exceptions.DevelopmentException;
 import com.kirchnersolutions.database.sessions.SessionService;
 import com.kirchnersolutions.database.sessions.WebSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -459,6 +460,28 @@ public class GeneralStompController {
         }else {
             debuggingService.stompDebug("@Stomp Send message requested by " + from + " denied due to lack of privilege");
             denyRequest("You do not have privilege for this function.", session.getStompID());
+        }
+    }
+
+    @MessageMapping("/backup/table")
+    public void backupTable(StompTableRequest request) throws Exception{
+        try{
+            socketStompService.backUpTable(request.getSessionid(), request.getTablename());
+        }catch (Exception e){
+            e.printStackTrace();
+            debuggingService.throwDevException(new DevelopmentException("Failed to backup table " + e.getMessage()));
+            debuggingService.nonFatalDebug("Failed to backup table " + e.getMessage());
+        }
+    }
+
+    @MessageMapping("/backup/all")
+    public void backupTableAll(StompTableRequest request) throws Exception{
+        try{
+            socketStompService.backUpTables(request.getSessionid());
+        }catch (Exception e){
+            e.printStackTrace();
+            debuggingService.throwDevException(new DevelopmentException("Failed to backup tables " + e.getMessage()));
+            debuggingService.nonFatalDebug("Failed to backup tables " + e.getMessage());
         }
     }
 

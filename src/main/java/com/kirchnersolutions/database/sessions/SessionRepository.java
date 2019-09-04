@@ -102,7 +102,7 @@ public class SessionRepository {
 
     private void RemoveSession(Session session) {
         int ind = session.getSessionIndex();
-        if (ind != -1 && ind <= sessionList.size()) {
+        if (ind != -1 && ind < sessionList.size()) {
             sessionList.remove(ind);
             clean(session);
             TrimSessionList();
@@ -175,11 +175,13 @@ public class SessionRepository {
             setSessionList(newList);
         }else{
             List<Session> newList = new ArrayList<>();
+            List<Session> temp = getSessions();
             int count = 0;
-            for (Session session : getSessions()) {
-                if (session != null) {
+            for(int i = 0; i < sessionList.size(); i++){
+                if(temp.get(i) != null){
+                    Session session = temp.get(i);
                     session.setIndex(count);
-                    newList.add(session);
+                    newList.add(count, session);
                     count++;
                 }
             }
@@ -198,14 +200,23 @@ public class SessionRepository {
     }
 
     public synchronized void clean(Session session){
-        List<Session> temp = new ArrayList<>(sessionList);
-        for(Session tsession : temp){
-            if(tsession.getUser() != null && tsession.getUser().getDetail("username").equals(session.getUser().getDetail("username"))){
-                temp.remove(tsession);
-                break;
+        if(session != null && session.getUser() != null){
+            List<Session> temp = new ArrayList<>(sessionList);
+            if(temp != null && !temp.isEmpty()){
+                for(Session tsession : temp){
+                    if(tsession != null && tsession.getUser() != null){
+                        if(tsession.getUser() != null && tsession.getUser().getDetail("username").equals(session.getUser().getDetail("username"))){
+                            temp.remove(tsession);
+                            break;
+                        }
+                    }
+
+                }
+                setSessionList(temp);
             }
+
         }
-        setSessionList(temp);
+
     }
 
     private List<Session> GetSessions(Map<String, String> request) {

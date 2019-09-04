@@ -14,7 +14,7 @@ import com.kirchnersolutions.utilities.CalenderConverter;
 import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@DependsOn({"devVars"})
+@DependsOn({"devVars", "socketServerConfiguration"})
 @Service
 public class DebuggingService {
 

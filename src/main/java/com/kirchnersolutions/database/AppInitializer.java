@@ -24,8 +24,8 @@ public class AppInitializer implements WebApplicationInitializer {
     public void onStartup(ServletContext servletContext) throws ServletException {
 
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
+        //rootContext.register(DatabaseApplication.class, SocketConfig.class);
         rootContext.register(DatabaseApplication.class);
-
         // Manage the lifecycle of the root application context
         servletContext.addListener(new ContextLoaderListener(rootContext));
 

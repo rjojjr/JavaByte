@@ -466,8 +466,7 @@ public class TablePage {
         List<Field> fields = new ArrayList<>();
         for (File field : fieldFiles) {
             try {
-                Field newField = (Field) databaseObjectFactory.databaseObjectFactory(ByteTools.readBytesFromFile(field));
-                newField.setFile(field);
+                Field newField = new Field(field);
                 //newField = new Field(field);
                 fields.add(newField);
             } catch (Exception e) {

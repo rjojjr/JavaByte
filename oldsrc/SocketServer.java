@@ -4,8 +4,6 @@ import com.kirchnersolutions.database.core.tables.TransactionService;
 import com.kirchnersolutions.database.dev.DebuggingService;
 import com.kirchnersolutions.database.exceptions.DevelopmentException;
 import com.kirchnersolutions.database.objects.DatabaseObjectFactory;
-import com.kirchnersolutions.database.objects.Transaction;
-import com.kirchnersolutions.database.sessions.Session;
 import com.kirchnersolutions.database.sessions.SessionService;
 import com.kirchnersolutions.database.sessions.SocketSession;
 import com.kirchnersolutions.utilities.SerialService.TransactionSerializer;
@@ -16,7 +14,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.util.Base64;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,10 +23,11 @@ class SocketServer implements Runnable{
 
     private volatile ServerSocket serverSocket;
     private volatile ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    private volatile TransactionService transactionService;
+    private TransactionSerializer transactionSerializer;
+    private volatile SessionService sessionService;
     private DebuggingService debuggingService;
-    private SessionService sessionService;
     private DatabaseObjectFactory databaseObjectFactory;
-    private TransactionService transactionService;
 
     private int port = 0;
     private volatile AtomicBoolean running = new AtomicBoolean(false);
@@ -79,7 +77,7 @@ class SocketServer implements Runnable{
             serverSocket.bind(new InetSocketAddress(InetAddress.getByName(inetAddress.getHostAddress()), port));
             debuggingService.socketDebug("Socket server manually started on port " + port);
             while (true) {
-                threadPoolTaskExecutor.execute(new IndependentClientHandler(serverSocket.accept(), (sessionService.getNewSocketSession()), debuggingService, this));
+                threadPoolTaskExecutor.execute(new IndependentClientHandler(serverSocket.accept(), transactionService, transactionSerializer, (sessionService.getNewSocketSession()), debuggingService, sessionService, databaseObjectFactory));
             }
         } catch (Exception ex) {
             setRunning(false);
@@ -92,7 +90,6 @@ class SocketServer implements Runnable{
 
     void startServer(int port) throws Exception{
         try {
-            debuggingService.socketDebug("Attempting to start socket server on port " + port);
             setRunning(true);
             serverSocket = new ServerSocket();
             InetAddress inetAddress = InetAddress.getLocalHost();
@@ -100,7 +97,7 @@ class SocketServer implements Runnable{
         //serverSocket = new ServerSocket(port, 1, InetAddress.getByName(inetAddress.getHostAddress()));
             debuggingService.socketDebug("Socket server started on port " + port);
             while (true) {
-                threadPoolTaskExecutor.execute(new IndependentClientHandler(serverSocket.accept(), (SocketSession)(sessionService.getNewSession("socket")), debuggingService, this));
+                threadPoolTaskExecutor.execute(new IndependentClientHandler(serverSocket.accept(), transactionService, transactionSerializer, (SocketSession)(sessionService.getNewSession("socket")), debuggingService, sessionService, databaseObjectFactory));
             }
             //debuggingService.socketDebug("Socket server started on port " + port);
         } catch (Exception ex) {
@@ -126,29 +123,6 @@ class SocketServer implements Runnable{
             debuggingService.throwDevException(new DevelopmentException("Failed to stop socket server on port " + port + " " + ex.getMessage()));
             debuggingService.nonFatalDebug("Failed to stop socket server on port " + port + " " + ex.getMessage());
             Logger.getLogger(MultiClientServer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    String processInput(String input, Session session) throws Exception{
-        try{
-            return new String(transactionService.submitTransaction((Transaction)databaseObjectFactory.databaseObjectFactory(Base64.getDecoder().decode(input.getBytes("UTF-8"))), session), "UTF-8");
-        }catch (Exception e){
-            debuggingService.socketDebug("Failed to parse socket input on port " + port);
-            debuggingService.throwDevException(new DevelopmentException("Failed to parse socket input on port " + port + " " + e.getStackTrace().toString()));
-            debuggingService.nonFatalDebug("Failed to parse socket input on port " + port + " " + e.getStackTrace().toString());
-        }
-        return "Failed";
-    }
-
-    void invalidate(Session session, int port) throws Exception{
-        try{
-            if(session.getUser() != null){
-                sessionService.logOff(4, session);
-            }
-        }catch (Exception e){
-            debuggingService.socketDebug("Failed to invalidate socket session on port " + port);
-            debuggingService.throwDevException(new DevelopmentException("Failed to invalidate socket session on port " + port + " " + e.getStackTrace().toString()));
-            debuggingService.nonFatalDebug("Failed to invalidate socket session on port " + port + " " + e.getStackTrace().toString());
         }
     }
 }

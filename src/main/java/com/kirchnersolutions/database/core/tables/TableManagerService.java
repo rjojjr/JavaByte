@@ -271,6 +271,10 @@ public class TableManagerService {
         return CreateRows(newRowFields, tableName).get();
     }
 
+    byte[] hashTableContainer(String tableName) throws Exception{
+        return tableThreadService.hashTable(getTableByName(tableName));
+    }
+
     private Map<BigInteger, Map<String, String>> EditRows(Map<BigInteger, Map<String, String>> changes, String tableName) throws Exception {
         return getTableByName(tableName).editFields(changes);
     }

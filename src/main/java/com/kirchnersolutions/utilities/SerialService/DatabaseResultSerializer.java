@@ -35,7 +35,7 @@ public class DatabaseResultSerializer implements Serializer<DatabaseResults> {
         String breakChar = "";
         string += breakChar;
         string += results.getMessage();
-        if (results.getResults() != null) {
+        if (results.getResults() != null && !results.getResults().isEmpty()) {
             try {
                 typeBytes = serializeObject((results.getResults()));
             } catch (Exception e) {
@@ -168,7 +168,11 @@ public class DatabaseResultSerializer implements Serializer<DatabaseResults> {
                 suc = new String(valueBytes, "UTF-8");
                 //System.out.println(suc);
                 results.setMessage(suc);
-                results.setResults((List<Map<String, String>>) deserializeObject(typeBytes));
+                if(typeBytes.length < 10){
+                    results.setResults(new ArrayList<Map<String, String>>());
+                }else{
+                    results.setResults((List<Map<String, String>>) deserializeObject(typeBytes));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

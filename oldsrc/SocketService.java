@@ -2,7 +2,10 @@ package com.kirchnersolutions.database.Servers.socket;
 
 import com.kirchnersolutions.database.core.tables.TransactionService;
 import com.kirchnersolutions.database.dev.DebuggingService;
+import com.kirchnersolutions.database.exceptions.DevelopmentException;
 import com.kirchnersolutions.database.objects.DatabaseObjectFactory;
+import com.kirchnersolutions.database.objects.Transaction;
+import com.kirchnersolutions.database.sessions.Session;
 import com.kirchnersolutions.database.sessions.SessionService;
 import com.kirchnersolutions.utilities.SerialService.TransactionSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.ApplicationScope;
 
 import javax.annotation.PostConstruct;
+import java.util.Base64;
 
-@Component
 @DependsOn({"threadPoolTaskExecutor", "debuggingService", "transactionService", "sessionService"})
 public class SocketService {
 
@@ -40,20 +43,10 @@ public class SocketService {
 
     @PostConstruct
     public void init() throws Exception{
-        this.multiClientServer = MultiClientServer.getInstance(threadPoolTaskExecutor, transactionService, transactionSerializer,
-                sessionService, debuggingService, databaseObjectFactory);
-        startServer();
-    }
-
-/*    @PostConstruct
-    public void init() throws Exception{
-        this.multiClientServer = MultiClientServer(threadPoolTaskExecutor, transactionService, transactionSerializer,
-                sessionService, debuggingService, databaseObjectFactory);
+        this.multiClientServer = MultiClientServer(threadPoolTaskExecutor, debuggingService, sessionService);
         startServer();
 
     }
-
- */
 
     public String getStats() {
         try{
@@ -92,4 +85,6 @@ public class SocketService {
             return false;
         }
     }
+
+
 }

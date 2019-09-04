@@ -972,6 +972,34 @@ public class HTTPController {
         }
     }
 
+    //Data Management
+    @GetMapping("/data")
+    public String dataManagement(Model model, HttpServletResponse response) throws Exception {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                .getRequest();
+        HttpSession httpSession = cookie(request, response);
+        if (httpSession.getAttribute("session") == null) {
+            ipLogger.log(request.getRemoteAddr(), "/data", "null");
+            model.addAttribute("form", httpService.newSession(httpSession, request.getRemoteAddr()));
+            model.addAttribute("ip", new IPBean(request.getRemoteAddr()));
+            return "logonForm";
+        }
+        UserBean userBean = httpService.getUserBean(httpSession, request.getRemoteAddr());
+        if (userBean != null) {
+            userBean.setMsg("");
+            ipLogger.log(request.getRemoteAddr(), "/data", userBean.getUsername());
+            model.addAttribute("user", userBean);
+            model.addAttribute("tables", httpService.getTableList());
+            // model.addAttribute("ip", new IPBean(request.getRemoteAddr()));
+            return "dataConsole";
+        } else {
+            ipLogger.log(request.getRemoteAddr(), "/data", "null");
+            model.addAttribute("form", httpService.newSession(httpSession, request.getRemoteAddr()));
+            model.addAttribute("ip", new IPBean(request.getRemoteAddr()));
+            return "logonForm";
+        }
+    }
+
     //Errors
 
     //Device has no certificate
