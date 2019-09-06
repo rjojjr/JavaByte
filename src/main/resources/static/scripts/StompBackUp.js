@@ -111,9 +111,9 @@ var connect_callback = function () {
         }
         if (msg[0] == "status") {
             var tstat = document.getElementById("tstat");
-            tstat.innerText = "Status: " + msg[1];
+            tstat.innerText = msg[1];
             var stat = document.getElementById("stat");
-            stat.innerText = "Status: " + msg[1];
+            stat.innerText = msg[1];
         }
         if (msg[0] == "deny") {
             var msg = 'Message From: ' + msg[1] + '\n\n' + msg[2];
@@ -165,9 +165,9 @@ function backupTable() {
         alert("Please select a table...");
     }else{
         var tstat = document.getElementById("tstat");
-        tstat.innerText = "Status: Submitting task...";
+        tstat.innerText = "Submitting task...";
         var stat = document.getElementById("stat");
-        stat.innerText = "Status: Submitting table task...";
+        stat.innerText = "Submitting table task...";
         stompClient.send("/app/backup/table", {},
             JSON.stringify({'username': username, 'session': sessionId, 'tablename': selectTable}));
     }
@@ -175,9 +175,9 @@ function backupTable() {
 
 function backupAll() {
     var tstat = document.getElementById("tstat");
-    tstat.innerText = "Status: Submitting task...";
+    tstat.innerText = "Submitting task...";
     var stat = document.getElementById("stat");
-    stat.innerText = "Status: Submitting table task...";
+    stat.innerText = "Submitting table task...";
     stompClient.send("/app/backup/all", {},
         JSON.stringify({'username': username, 'session': sessionId, 'tablename': selectTable}));
 }

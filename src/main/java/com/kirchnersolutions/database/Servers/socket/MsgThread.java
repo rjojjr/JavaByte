@@ -15,7 +15,10 @@ public class MsgThread implements Callable<String> {
     @Override
     public String call() throws Exception {
         if (backupClient.isConnected()) {
-            return backupClient.sendMessage(msg);
+            //System.out.println("here");
+            String out = backupClient.sendMessage(msg);
+            ///System.out.println(out);
+            return out;
         }
         return "null";
     }

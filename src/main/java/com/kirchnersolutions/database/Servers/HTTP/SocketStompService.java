@@ -81,7 +81,7 @@ public class SocketStompService {
         bk1.startConnection("192.168.1.175", 4431);
         debuggingService.socketDebug("Connected to socket server at address 192.168.1.175 port 4431");
         debuggingService.socketDebug("Connecting to socket server at address 192.168.1.215 port 4432");
-        bk1.startConnection("192.168.1.215", 4431);
+        bk2.startConnection("192.168.1.215", 4432);
         debuggingService.socketDebug("Connected to socket server at address 192.168.1.215 port 4432");
         List<String> tables = tableManagerService.getTableNames();
         this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Generating table checksums", createHeaders(stompID));

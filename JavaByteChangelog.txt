@@ -2,11 +2,12 @@ JavaByte Modern Database Changelog
 
 2019 Kirchner Solutions
 
-09040/2019
+09/040/2019
 1.0.18a
 #########################################################################
 Build 21109
 	Started backup service impl.
+	Fixed Unix system stats.
 
 #########################################################################
 

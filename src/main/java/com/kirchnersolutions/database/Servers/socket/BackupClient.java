@@ -45,12 +45,11 @@ public class BackupClient {
         try{
             if(isConnected()){
 
-                out.println(Base64.getEncoder().encode(msg.getBytes("UTF-8")));
-                out.flush();
+                out.println(new String(Base64.getEncoder().encode(msg.getBytes("UTF-8")), "UTF-8"));
                 // System.out.println("here");
                 //System.out.println("null");
                 String resp = in.readLine();
-                resp = new String(Base64.getDecoder().decode(resp), "UTF-8");
+                resp = new String(Base64.getDecoder().decode(resp.getBytes("UTF-8")), "UTF-8");
                 if(resp.contains("-close")){
                     stopConnection();
                     connected.set(false);
@@ -62,9 +61,10 @@ public class BackupClient {
                 return resp;
             }
         }catch (Exception e){
-            //e.printStackTrace();
+            e.printStackTrace();
             connected.set(false);
         }
+        //System.out.println("here");
         stopConnection();
         return null;
     }

@@ -80,7 +80,7 @@ public class SystemStatsService {
             stats = getSystem(si, os, cs, cpu) + ",\n : " + getCPU(cpu, wcp)
                     + getCPULoads(osBean) +
                     "%,\n : " + getThreads(bean) + ", \n: " + getMemory(wgm)
-                    + getAllWinDiskStats();
+                    + getAllLinDiskStats();
         }
         return stats;
     }
