@@ -7,6 +7,7 @@
     <link type="text/css" th:href="@{/styles/layout.css}" rel="stylesheet">
     <link type="text/css" th:href="@{/styles/general.css}" rel="stylesheet">
     <link type="text/css" th:href="@{/styles/tabs.css}" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--
     <link rel="stylesheet" type="text/css" href="/styles/layout.css">
     <link rel="stylesheet" type="text/css" href="/styles/general.css">
@@ -52,6 +53,7 @@
     <header id="header" class="clear">
         <h1>JavaByte Data Management Console</h1>
         <p th:object="${user}" th:text="*{msg}" style="color:red; text-align: center;"><b></b></p>
+
     </header>
 </div>
 <!-- ####################################################################################################### -->
@@ -84,7 +86,7 @@
                     <hr>
                     <p>Status: <p id="stat">Idle</p></p>
                     <hr>
-                    <p>Backup Name = <input type="text" id="fName" placeholder="Backup Name"></p>
+                    <!--<p>Backup Name = <input type="text" id="fName" placeholder="Backup Name"></p>-->
                     <button type="button" onclick="backupAll()">Start Backup</button>
                 </div>
             </div>
@@ -150,7 +152,7 @@
                 <li><a href="/">Home</a>
 
                     <ul>
-                        <li><p><b>Traffic Console</b></p>
+                        <li><p><b>Data Management Console</b></p>
                         </li>
                         <li th:if="${user.admin}">
                             <a href="/users">User Console</a>
@@ -158,6 +160,9 @@
                         <li>
                             <a href="/tables">Table Console</a>
 
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/traffic">Traffic Console</a>
                         </li>
                         <li th:if="${user.admin}">
                             <a href="/logs">Log Console</a>
@@ -168,6 +173,7 @@
                         <li th:if="${user.admin}">
                             <a href="/maintenance">Maintenance Console</a>
                         </li>
+
                         <li th:if="${user.admin}">
                             <a href="/devices">Device Console</a>
                         </li>

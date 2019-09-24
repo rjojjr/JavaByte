@@ -153,8 +153,6 @@ function sendUsername() {
 
 function tableSummary(tablename) {
     tableName = tablename;
-    table = document.getElementById("tableresult");
-    deleteTable(table);
     document.getElementById("tabHead").innerText = tablename + " Status";
     stompClient.send("/app/table/info", {},
         JSON.stringify({'username': username, 'session': sessionId, 'tablename': tablename}));

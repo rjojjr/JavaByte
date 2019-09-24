@@ -3,9 +3,7 @@
 <head>
     <title>JavaByte Table Console</title>
     <meta charset="UTF-8">
-    <link type="text/css" th:href="@{/styles/layout.css}" rel="stylesheet">
-    <link type="text/css" th:href="@{/styles/general.css}" rel="stylesheet">
-    <link type="text/css" th:href="@{/styles/tabs.css}" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--[if lt IE 9]>
     <script src="../static/scripts/html5shiv.js"></script><![endif]-->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
@@ -14,7 +12,9 @@
     <link rel="manifest" href="/favicon/site.webmanifest">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
-
+    <link type="text/css" th:href="@{/styles/layout.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/general.css}" rel="stylesheet">
+    <link type="text/css" th:href="@{/styles/tabs.css}" rel="stylesheet">
     <script th:src="@{/scripts/sockjs.js}"></script>
     <script th:src="@{/scripts/stomp.js}"></script>
     <script th:src="@{/scripts/tabsTable.js}"></script>
@@ -216,7 +216,10 @@
                             <a href="/traffic">Traffic Console</a>
                         </li>
                         <li th:if="${user.admin}">
-                            <a href="/maintenance">Maintenance Consolee</a>
+                            <a href="/maintenance">Maintenance Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/data">Data Management Console</a>
                         </li>
                         <li th:if="${user.admin}">
                             <a href="/logs">Log Console</a>

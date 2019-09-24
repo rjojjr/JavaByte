@@ -62,6 +62,8 @@ Contents:
 			b. Table Query
 
 	4. Client API
+		1. Port Configuration
+		2. Socket Encryption
 
 		A. Single Client
 
@@ -653,19 +655,39 @@ Sub-Sections:
 #########################################################################
 
 Sub-Sections:
+	1. Port Configuration
+	2. Socket Security
 	A. Single Client
-	b. 
+	B. Enterprise Client
 
 #########################################################################
 
-a. Port Configuration
+1. Port Configuration
+
+To assign a port for socket client connections. Go to the Maintenance
+Console and select the System Configuration tab. Proceed to select
+Socket Variables. Enter your desired port in the Application Driver
+Port box and submit changes.
+
+-------------------------------------------------------------------------
+
+2. Socket Security
+
+All socket connections are secured with 256bit AES encryption. Upon
+initial connection, the client generates a random RSA key pair, and 
+sends a public key to the JavaByte server. JavaByte then generates 
+a securely random AES key, encrypts it, and sends it back to the 
+client to be decrypted with its RSA private key. 
+
+After this handshake, both the client and JavaByte will use the AES key
+for the remainder of the session.
+
+-------------------------------------------------------------------------
+
+A. Single Client
 
 
 
 -------------------------------------------------------------------------
 
-b. SSL
-
-
-
--------------------------------------------------------------------------
+B. Enterprise Client

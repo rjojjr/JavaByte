@@ -1,5 +1,6 @@
 package com.kirchnersolutions.utilities;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -11,15 +12,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base64;
 import static sun.security.krb5.Confounder.bytes;
 
 /**
@@ -69,31 +69,178 @@ public class CryptTools {
 
     }
 
-    public static PublicKey getPublicKeyFromBytes(byte[] key) throws Exception {
-        byte[] byteKey = Base64.decodeBase64(new String(key));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        ;
-        X509EncodedKeySpec spec = new X509EncodedKeySpec(byteKey);
-        PublicKey publicKey = keyFactory.generatePublic(spec);
-        return publicKey;
+    public static String decryptRSAMsg(String encryptedText, PrivateKey privateKey) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        return new String(cipher.doFinal(java.util.Base64.getDecoder().decode(encryptedText)));
     }
 
-    public static String decryptRSAMsg(String encryptedText, PrivateKey privateKey) throws Exception {
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        return new String(cipher.doFinal(Base64.decodeBase64(encryptedText)));
+    /*
+    public static String  encrypt(String text, PublicKey publicKey) throws Exception {
+        // Set the plain text
+        com.nimbusds.jose.Payload payload = new Payload(text);
+        // Create the header
+        JWEHeader header = new JWEHeader(RSA_OAEP_256, EncryptionMethod.A128CBC_HS256);
+        // Create the JWE object and encrypt it
+        JWEObject jweObject = new JWEObject(header, payload);
+        jweObject.encrypt(new RSAEncrypter(publicKey);
+        // Serialise to compact JOSE form...
+        String jweString = jweObject.serialize();
+        LOG.info("Generated Encrypted Key : {}", jweString);
+        return jweString;
     }
+
+     */
 
     public static String encryptRSAMsg(String plainText, PublicKey publicKey) throws Exception {
+        /*
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        return Base64.encodeBase64String(cipher.doFinal(Base64.decodeBase64(plainText)));
+        return new String(Base64.getEncoder().encode(cipher.doFinal(java.util.Base64.getDecoder().decode(plainText))), "UTF-8");
+
+         */
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        return new java.lang.String(cipher.doFinal(plainText.getBytes("UTF-8")), "UTF-8");
+    }
+
+    private static byte[] processRSAList(List<byte[]> input, boolean encrypt) {
+        byte[] out;
+        if (true) {
+            out = new byte[(input.size() * 16)];
+        } else {
+            out = new byte[(input.size() * 16)];
+        }
+
+        int count = 0;
+        for (byte[] bytes : input) {
+            //System.out.println(bytes.length);
+            for (byte byt : bytes) {
+                out[count] = byt;
+                count++;
+            }
+        }
+        return out;
     }
 
 
+    private static byte[][] generateBlocks(byte[] data, boolean encrypt) {
+        int size = data.length / 16;
+        if (data.length % 16 != 0) {
+            size++;
+        }
+        byte[][] blocks = new byte[size][16];
+        int count1 = 0, count2 = 0, count3 = 0;
+        byte[] temp = new byte[16];
+        for (byte byt : data) {
+            if (count2 == 15) {
+                temp[count2] = data[count3];
+                blocks[count1] = temp;
+                count1++;
+                count3++;
+                count2 = 0;
+                temp = new byte[16];
+            } else {
+                temp[count2] = data[count3];
+                count2++;
+                count3++;
+            }
+        }
+        if (count2 != 0) {
+            byte[] bfinal = new byte[count2];
+            for (int i = 0; i < count2; i++) {
+                bfinal[i] = temp[i];
+            }
+            blocks[count1] = bfinal;
+        }
+        return blocks;
+    }
 
-    public static SecretKey generateSecretKey(byte[] password) {
+    public static byte[] aesDecrypt(SecretKey key, byte[] input) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(generateIV(key)));
+        if (input.length < 16) {
+            return cipher.doFinal(input);
+        }
+        List<byte[]> output = new ArrayList<>();
+        byte[][] blocks = generateBlocks(input, false);
+        int count = 0;
+        for (byte[] block : blocks) {
+            if (count + 1 == blocks.length) {
+                output.add(cipher.doFinal(block));
+                break;
+            } else {
+                output.add(cipher.update(block));
+                count++;
+            }
+        }
+        return processList(output, false);
+    }
+
+    public static byte[] aesEncrypt(SecretKey key, byte[] input) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        //byte[] iv = generateRandomBytes(16);
+        cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(generateIV(key)));
+        if (input.length < 16) {
+            return cipher.doFinal(input);
+        }
+        List<byte[]> output = new ArrayList<>();
+        byte[][] blocks = generateBlocks(input, true);
+        int count = 0;
+        //cipher.update(new byte[16]);
+        for (byte[] block : blocks) {
+            if (count + 1 == blocks.length) {
+                output.add(cipher.doFinal(block));
+                break;
+            } else {
+                output.add(cipher.update(block));
+                count++;
+            }
+        }
+        return processList(output, true);
+    }
+
+    private static byte[] processList(List<byte[]> input, boolean encrypt) {
+        byte[] out;
+        if (true) {
+            out = new byte[(input.size() * 16) + 16];
+        } else {
+            out = new byte[(input.size() * 16)];
+        }
+
+        int count = 0;
+        for (byte[] bytes : input) {
+            //System.out.println(bytes.length);
+            for (byte byt : bytes) {
+                out[count] = byt;
+                count++;
+            }
+        }
+        return out;
+    }
+
+    private static byte[] generateIV(SecretKey secretKey) throws Exception {
+        byte[] sha = getSHA256(secretKey.getEncoded());
+        for (int i = 0; i < 15; i++) {
+            sha = getSHA256(secretKey.getEncoded(), sha);
+        }
+        return Arrays.copyOfRange(sha, 3, 19);
+    }
+
+    static SecretKey generateSecretKey(byte[] password) {
         try {
+            final MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+            final byte[] digestOfPassword = md.digest(password);
+            return new SecretKeySpec(digestOfPassword, "AES");
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static SecretKey generateRandomSecretKey() {
+        try {
+            byte[] password = generateRandomBytes(1024 * 1024);
             final MessageDigest md = MessageDigest.getInstance("SHA-256");
             final byte[] digestOfPassword = md.digest(password);
             return new SecretKeySpec(digestOfPassword, "AES");
@@ -101,47 +248,61 @@ public class CryptTools {
             return null;
         }
     }
-/*
-    public static String getRandomSecretAESKeyAsString() throws Exception {
-        KeyGenerator generator = KeyGenerator.getInstance("AES");
-        generator.init(128); // The AES key size in number of bits
-        SecretKey secKey = generator.generateKey();
-        String encodedKey = new String(Base64.encodeBase64(secKey.getEncoded()));
-        return encodedKey;
+
+    public static byte[] serializeAESKey(SecretKey key) {
+        return key.getEncoded();
     }
 
-    public static String getSecretAESKeyAsString(byte[] password) throws Exception {
-        SecretKey secKey = generateSecretKey(password);
-        String encodedKey = new String(Base64.encodeBase64(secKey.getEncoded()));
-        return encodedKey;
+    public static File serializeAESKey(SecretKey key, File out) throws Exception {
+        byte[] temp = key.getEncoded();
+        temp = java.util.Base64.getEncoder().encode(temp);
+        if (!out.exists()) {
+            out.createNewFile();
+        }
+        ByteTools.writeBytesToFile(out, temp);
+        return out;
     }
 
-    public static String encryptTextUsingAES(String plainText, String aesKeyString) throws Exception {
-        byte[] decodedKey = Base64.decodeBase64(aesKeyString);
-        SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
-        // AES defaults to AES/ECB/PKCS5Padding in Java 7
-        Cipher aesCipher = Cipher.getInstance("AES");
-        aesCipher.init(Cipher.ENCRYPT_MODE, originalKey);
-        byte[] byteCipherText = aesCipher.doFinal(plainText.getBytes());
-        return new String(Base64.encodeBase64(byteCipherText));
+    public static SecretKey deserializeAESKey(byte[] bytes) {
+        SecretKey key = new SecretKeySpec(bytes, "AES");
+        return key;
     }
 
-    public static String decryptTextUsingAES(String encryptedText, String aesKeyString) throws Exception {
-        byte[] decodedKey = Base64.decodeBase64(aesKeyString);
-        SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
-        // AES defaults to AES/ECB/PKCS5Padding in Java 7
-        Cipher aesCipher = Cipher.getInstance("AES");
-        aesCipher.init(Cipher.DECRYPT_MODE, originalKey);
-        byte[] bytePlainText = aesCipher.doFinal(Base64.decodeBase64(encryptedText));
-        return new String(bytePlainText);
+    static SecretKey deserializeAESKey(File keyf) throws Exception {
+        byte[] bytes = Base64.getDecoder().decode(ByteTools.readBytesFromFile(keyf));
+        return deserializeAESKey(bytes);
     }
-
- */
 
     public static byte[] getSHA256(String msg) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(msg.getBytes());
         byte[] byteData = md.digest();
         return byteData;
+    }
+
+    public static byte[] getSHA256(byte[] msg) throws Exception {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(msg);
+        byte[] byteData = md.digest();
+        return byteData;
+    }
+
+    static byte[] getSHA256(byte[] msg, byte[] prev) throws Exception {
+        BigInteger one = new BigInteger(msg);
+        BigInteger two = new BigInteger(prev);
+        one = one.add(two);
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(one.toByteArray());
+        byte[] byteData = md.digest();
+        return byteData;
+    }
+
+    private static byte[] generateRandomBytes(int size) {
+        byte[] bytes = new byte[size];
+        Random random = new Random();
+        for (int i = 0; i < size; i++) {
+            bytes[i] = (byte) random.nextInt(125);
+        }
+        return bytes;
     }
 }

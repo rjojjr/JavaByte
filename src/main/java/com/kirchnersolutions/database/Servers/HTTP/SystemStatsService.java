@@ -32,6 +32,8 @@ public class SystemStatsService {
     private TableManagerService tableManagerService;
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Autowired
+    private SysVars sysVars;
 
     /**
      * Returns string of systems stats formatted for maintenance console table.
@@ -200,8 +202,13 @@ public class SystemStatsService {
     }
 
     private int GetCpuThreadCount(){
-        WindowsCentralProcessor wcp = new WindowsCentralProcessor();
-        return wcp.getLogicalProcessorCount();
+        if(sysVars.getVars()[0].contains("w") || sysVars.getVars()[0].contains("W")){
+            WindowsCentralProcessor wcp = new WindowsCentralProcessor();
+            return wcp.getLogicalProcessorCount();
+        }else{
+            LinuxCentralProcessor cp = new LinuxCentralProcessor();
+            return cp.getLogicalProcessorCount();
+        }
     }
 
     private String TableStats(){

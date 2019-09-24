@@ -4,6 +4,8 @@
     <title>JavaByte User Console</title>
     <meta charset="UTF-8">
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link type="text/css" th:href="@{/styles/layout.css}" rel="stylesheet">
     <link type="text/css" th:href="@{/styles/general.css}" rel="stylesheet">
     <link type="text/css" th:href="@{/styles/tabs.css}" rel="stylesheet">
@@ -318,6 +320,9 @@
                         </li>
                         <li th:if="${user.admin}">
                             <a href="/maintenance">Maintenance Console</a>
+                        </li>
+                        <li th:if="${user.admin}">
+                            <a href="/data">Data Management Console</a>
                         </li>
                         <li th:if="${user.admin}">
                             <a href="/devices">Device Console</a>

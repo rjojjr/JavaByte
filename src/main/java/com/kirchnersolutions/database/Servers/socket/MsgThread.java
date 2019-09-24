@@ -17,6 +17,9 @@ public class MsgThread implements Callable<String> {
         if (backupClient.isConnected()) {
             //System.out.println("here");
             String out = backupClient.sendMessage(msg);
+            if(out.contains("f")){
+                return "null";
+            }
             ///System.out.println(out);
             return out;
         }

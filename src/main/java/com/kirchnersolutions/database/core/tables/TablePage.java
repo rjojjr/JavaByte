@@ -628,7 +628,10 @@ public class TablePage {
                 row.put("index", rowFile.getName());
                 TableMethods.compileRow(row, rowFile);
                 if (TableMethods.verifyRow(request, row)) {
-                    found.addAndGet(1);
+                    synchronized (this){
+                        found.addAndGet(1);
+                    }
+
                     results.add(row.get(new String("index")));
                 }
             }

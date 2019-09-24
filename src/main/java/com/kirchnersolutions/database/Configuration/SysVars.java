@@ -13,10 +13,10 @@ import java.io.File;
 @Component
 public class SysVars {
 
-    public static final String VERSION = "1.0.18a";
-    public static final String BUILD = "21109";
-    //public static final String OS = "WIN";
-    public static final String OS = "LIN";
+    public static final String VERSION = "1.0.20a";
+    public static final String BUILD = "21110";
+    public static final String OS = "WIN";
+    //public static final String OS = "LIN";
 
     private String characterEncoding = "UTF-8", newLineChar = "\r\n", fileSeperator = File.separatorChar + "", passwordLife = "none", os = "win";
 
@@ -56,7 +56,7 @@ public class SysVars {
         characterEncoding = vars[0];
 
         if(vars[1].contains("wi") || vars[1].contains("W")){
-            //os = "win";
+            os = "WIN";
             newLineChar = "\r\n";
             fileSeperator = File.separatorChar + "";
         }else{
@@ -71,7 +71,7 @@ public class SysVars {
         String[] vars = new String[3];
         vars[0] = characterEncoding;
         //vars[1] = os;
-        if(os.equals("win")){
+        if(os.equals("WIN")){
             newLineChar = "\r\n";
         }else {
             newLineChar = "\n";
@@ -84,7 +84,7 @@ public class SysVars {
         String[] vars = new String[3];
         vars[0] = "Character Encoding:" + characterEncoding;
         vars[1] = "OS:" + os;
-        if(os.equals("win")){
+        if(os.equals("WIN")){
             newLineChar = "\r\n";
         }else {
             newLineChar = "\n";

@@ -40,6 +40,8 @@ class IndependentClientHandler implements Runnable {
 
     private SocketServer socketServer;
 
+    private Keys keys;
+
     private volatile boolean loggedOn = false;
     private String userName = "";
 
@@ -52,6 +54,7 @@ class IndependentClientHandler implements Runnable {
         this.debuggingService = debuggingService;
         //System.out.println("here");
         stop = false;
+        keys = new Keys();
     }
 
     public String getUserName() {
@@ -95,31 +98,48 @@ class IndependentClientHandler implements Runnable {
             Logger.getLogger(MultiClientServer.class.getName()).log(Level.SEVERE, null, ex);
         }
         String inputLine;
+        boolean key = false;
         try {
             while ((inputLine = in.readLine()) != null) {
                 //debuggingService.socketDebug("Input: " + inputLine);
                 //System.out.println("here");
-                if (session.getUser() != null) {
-                    dev.setUsername(session.getUser().getDetail("username"));
-                    debuggingService.socketDebug("Socket request received from " + dev.getUsername() + " on port " + port + " address " + ip);
-                } else {
-                    debuggingService.socketDebug("Socket request received from null " + "on port " + port + " address " + ip);
+                if(!key){
+                    if(keys.getPublicKey(new String(Base64.getDecoder().decode(inputLine), "UTF-8"))){
+                        key = true;
+                        String keyOut;
+                        if((keyOut = keys.encryptAESKey()) == null){
+                            debuggingService.socketDebug("Failed to get generate AES key for client " + ip + " on port " + port + "\r\nConnection closed.");
+                            debuggingService.nonFatalDebug("Failed to get generate AES key for client " + ip + " on port " + port + "\r\nConnection closed.");
+                            break;
+                        }
+                        out.write(new String(Base64.getEncoder().encode(keyOut.getBytes("UTF-8"))) + "\n");
+                        out.flush();
+                    }else{
+                        debuggingService.socketDebug("Failed to get public key from client " + ip + " on port " + port + "\r\nConnection closed.");
+                        debuggingService.nonFatalDebug("Failed to get public key from client " + ip + " on port " + port + "\r\nConnection closed.");
+                        break;
+                    }
+                }else {
+                    if (session.getUser() != null) {
+                        dev.setUsername(session.getUser().getDetail("username"));
+                        debuggingService.socketDebug("Socket request received from " + dev.getUsername() + " on port " + port + " address " + ip);
+                    } else {
+                        debuggingService.socketDebug("Socket request received from null " + "on port " + port + " address " + ip);
+                    }
+                    String output = socketServer.processInput(new String(keys.decryptAESResponse(inputLine.getBytes("UTF-8")), "UTF-8"), session);
+                    output = new String(keys.encryptAESRequest(output.getBytes("UTF-8")), "UTF-8");
+                    if (session == null) {
+                        out.write("-close\n");
+                        out.flush();
+                        break;
+                    } else {
+                        output = new String(Base64.getEncoder().encode(output.getBytes("UTF-8")), "UTF-8");
+                        out.write(output + "\n");
+                        dev.setUsername(session.getUser().getDetail("username"));
+                        out.flush();
+                        debuggingService.socketDebug("Socket request received from " + dev.getUsername() + " processed successfully on port " + port + " address " + ip);
+                    }
                 }
-                String output = socketServer.processInput(inputLine, session);
-                if (session == null) {
-                    out.write("-close");
-                    out.flush();
-                    break;
-                } else {
-                    output = new String(Base64.getEncoder().encode(output.getBytes("UTF-8")), "UTF-8");
-                    out.write(output + "\n");
-
-                    dev.setUsername(session.getUser().getDetail("username"));
-                    out.flush();
-                    debuggingService.socketDebug("Socket request received from " + dev.getUsername() + " processed successfully on port " + port + " address " + ip);
-                }
-
-                //debuggingService.socketDebug("Output: " + output);
             }
             if (session != null) {
                 socketServer.invalidate(session, port);

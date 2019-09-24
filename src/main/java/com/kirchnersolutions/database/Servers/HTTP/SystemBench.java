@@ -1,5 +1,6 @@
 package com.kirchnersolutions.database.Servers.HTTP;
 
+import com.kirchnersolutions.database.Configuration.SysVars;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -22,6 +23,8 @@ public class SystemBench {
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Autowired
     private volatile SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
+    private SysVars sysVars;
 
     private volatile AtomicBoolean primecount = new AtomicBoolean(false), primetime = new AtomicBoolean(false), hashcount = new AtomicBoolean(false), hashtime = new AtomicBoolean(false), randombytes = new AtomicBoolean(false), inttime = new AtomicBoolean(false), intcount = new AtomicBoolean(false), floattime = new AtomicBoolean(false);
     private volatile AtomicBoolean primecounte = new AtomicBoolean(false), primetimee = new AtomicBoolean(false), hashcounte = new AtomicBoolean(false), hashtimee = new AtomicBoolean(false), randombytese = new AtomicBoolean(false), inttimee = new AtomicBoolean(false), intcounte = new AtomicBoolean(false), floattimee = new AtomicBoolean(false);

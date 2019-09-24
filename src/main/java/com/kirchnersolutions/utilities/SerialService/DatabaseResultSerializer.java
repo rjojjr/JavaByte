@@ -9,10 +9,7 @@ import com.kirchnersolutions.database.objects.Field;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DatabaseResultSerializer implements Serializer<DatabaseResults> {
 
@@ -241,6 +238,7 @@ public class DatabaseResultSerializer implements Serializer<DatabaseResults> {
                 out.close();
                 bos.close();
                 bytes = bos.toByteArray();
+                bytes = Base64.getEncoder().encode(bytes);
             } catch (Exception e) {
                 throw new SerialException("Failed to serialize object");
             }
@@ -257,6 +255,7 @@ public class DatabaseResultSerializer implements Serializer<DatabaseResults> {
      * @throws SerialException
      */
     public List<Map<String, String>> deserializeObject(byte[] bytes) throws SerialException{
+        bytes = Base64.getDecoder().decode(bytes);
         ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
         ObjectInputStream in = null;
         List<Map<String, String>> o;

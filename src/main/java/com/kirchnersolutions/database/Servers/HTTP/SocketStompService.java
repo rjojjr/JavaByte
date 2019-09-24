@@ -35,21 +35,21 @@ public class SocketStompService {
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
-    void getSocketStat(String stompID){
+    void getSocketStat(String stompID) {
         String result = "socket%" + multiClientServer.getStats();
         this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", result, createHeaders(stompID));
     }
 
     void shutdownSocket(String stompID) {
-        try{
-            if(multiClientServer.stop()){
+        try {
+            if (multiClientServer.stop()) {
                 this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "3%System%Socket server shutdown successful", createHeaders(stompID));
                 getSocketStat(stompID);
-            }else{
+            } else {
                 this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "3%System%Socket server shutdown unsuccessful", createHeaders(stompID));
                 getSocketStat(stompID);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             debuggingService.socketDebug("Failed to shutdown socket server.");
             debuggingService.stompDebug("@Stomp Failed to shutdown socket server.");
             debuggingService.nonFatalDebug("Failed to shutdown socket server." + e.getStackTrace().toString());
@@ -57,98 +57,148 @@ public class SocketStompService {
 
     }
 
-    void startSocket(String stompID){
-        try{
-            if(multiClientServer.start()){
+    void startSocket(String stompID) {
+        try {
+            if (multiClientServer.start()) {
                 this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "3%System%Socket server startup successful", createHeaders(stompID));
                 getSocketStat(stompID);
-            }else{
+            } else {
                 this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "3%System%Socket server startup unsuccessful", createHeaders(stompID));
                 getSocketStat(stompID);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             debuggingService.socketDebug("Failed to start socket server.");
             debuggingService.stompDebug("@Stomp Failed to start socket server.");
             debuggingService.nonFatalDebug("Failed to start socket server." + Arrays.toString(e.getStackTrace()));
         }
     }
 
-    void backUpTables(String stompID) throws Exception{
+    void backUpTables(String stompID) throws Exception {
         debuggingService.stompDebug("@Stomp Database backup requested by session: " + stompID);
         BackupClient bk1 = new BackupClient();
         BackupClient bk2 = new BackupClient();
+        BackupClient bk3 = new BackupClient();
         debuggingService.socketDebug("Connecting to socket server at address 192.168.1.175 port 4431");
         bk1.startConnection("192.168.1.175", 4431);
         debuggingService.socketDebug("Connected to socket server at address 192.168.1.175 port 4431");
-        debuggingService.socketDebug("Connecting to socket server at address 192.168.1.215 port 4432");
-        bk2.startConnection("192.168.1.215", 4432);
-        debuggingService.socketDebug("Connected to socket server at address 192.168.1.215 port 4432");
+        debuggingService.socketDebug("Connecting to socket server at address 192.168.1.170 port 4432");
+        bk2.startConnection("192.168.1.170", 4432);
+        debuggingService.socketDebug("Connected to socket server at address 192.168.1.170 port 4432");
+        debuggingService.socketDebug("Connecting to socket server at address 192.168.1.195 port 4433");
+        bk3.startConnection("192.168.1.195", 4433);
+        debuggingService.socketDebug("Connected to socket server at address 192.168.1.195 port 4433");
         List<String> tables = tableManagerService.getTableNames();
         this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Generating table checksums", createHeaders(stompID));
         boolean hashb = true;
-        for(int i = 0; i < tables.size(); i++){
+        for (int i = 0; i < tables.size(); i++) {
             String hash = "h;" + tables.get(i);
             i++;
-            if(i < tables.size()){
+            if (i < tables.size() && i + 1 < tables.size()) {
                 Future<String> fut1 = threadPoolTaskExecutor.submit(new MsgThread(hash, bk1));
                 Future<String> fut2 = threadPoolTaskExecutor.submit(new MsgThread("h;" + tables.get(i), bk2));
+                i++;
+                Future<String> fut3 = threadPoolTaskExecutor.submit(new MsgThread("h;" + tables.get(i), bk3));
                 String res = fut1.get();
-                if(res.equals("null")){
+                if (res.equals("null")) {
                     this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table checksums", createHeaders(stompID));
                     hashb = false;
                     break;
                 }
                 res = fut2.get();
-                if(res.equals("null")){
+                if (res.equals("null")) {
                     this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table checksums", createHeaders(stompID));
                     hashb = false;
                     break;
                 }
-            }else{
+                res = fut3.get();
+                if (res.equals("null")) {
+                    this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table checksums", createHeaders(stompID));
+                    hashb = false;
+                    break;
+                }
+            } else if (i < tables.size()) {
+                Future<String> fut1 = threadPoolTaskExecutor.submit(new MsgThread(hash, bk1));
+                Future<String> fut2 = threadPoolTaskExecutor.submit(new MsgThread("h;" + tables.get(i), bk2));
+                String res = fut1.get();
+                if (res.equals("null")) {
+                    this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table checksums", createHeaders(stompID));
+                    hashb = false;
+                    break;
+                }
+                res = fut2.get();
+                if (res.equals("null")) {
+                    this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table checksums", createHeaders(stompID));
+                    hashb = false;
+                    break;
+                }
+            } else {
                 Future<String> fut1 = threadPoolTaskExecutor.submit(new MsgThread(hash, bk1));
                 String res = fut1.get();
-                if(res.equals("null")){
+                if (res.equals("null")) {
                     this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table checksums", createHeaders(stompID));
                     hashb = false;
                     break;
                 }
             }
         }
-        if(hashb){
+        if (hashb) {
             this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Generating table backups", createHeaders(stompID));
-            for(int i = 0; i < tables.size(); i++){
+            for (int i = 0; i < tables.size(); i++) {
                 String hash = "bk;" + tables.get(i);
                 i++;
-                if(i < tables.size()){
+                if (i < tables.size() && i + 1 < tables.size()) {
                     Future<String> fut1 = threadPoolTaskExecutor.submit(new MsgThread(hash, bk1));
                     Future<String> fut2 = threadPoolTaskExecutor.submit(new MsgThread("bk;" + tables.get(i), bk2));
+                    i++;
+                    Future<String> fut3 = threadPoolTaskExecutor.submit(new MsgThread("bk;" + tables.get(i), bk3));
                     String res = fut1.get();
-                    if(res.equals("null")){
+                    if (res.equals("null")) {
                         this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table backups", createHeaders(stompID));
                         hashb = false;
                         break;
                     }
                     res = fut2.get();
-                    if(res.equals("null")){
+                    if (res.equals("null")) {
                         this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table backups", createHeaders(stompID));
                         hashb = false;
                         break;
                     }
-                }else{
+                    res = fut3.get();
+                    if (res.equals("null")) {
+                        this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table backups", createHeaders(stompID));
+                        hashb = false;
+                        break;
+                    }
+                } else if (i < tables.size()) {
+                    Future<String> fut1 = threadPoolTaskExecutor.submit(new MsgThread(hash, bk1));
+                    Future<String> fut2 = threadPoolTaskExecutor.submit(new MsgThread("bk;" + tables.get(i), bk2));
+                    String res = fut1.get();
+                    if (res.equals("null")) {
+                        this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table backups", createHeaders(stompID));
+                        hashb = false;
+                        break;
+                    }
+                    res = fut2.get();
+                    if (res.equals("null")) {
+                        this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table backups", createHeaders(stompID));
+                        hashb = false;
+                    }
+                } else {
                     Future<String> fut1 = threadPoolTaskExecutor.submit(new MsgThread(hash, bk1));
                     String res = fut1.get();
-                    if(res.equals("null")){
+                    if (res.equals("null")) {
                         this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table backups", createHeaders(stompID));
                         hashb = false;
                         break;
                     }
                 }
             }
-        }
-        bk1.stopConnection();
-        bk2.stopConnection();
-        if(hashb){
-            this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Backup finished successfully", createHeaders(stompID));
+            bk1.stopConnection();
+            bk2.stopConnection();
+            bk3.stopConnection();
+            if (hashb) {
+                this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Backup finished successfully", createHeaders(stompID));
+            }
         }
     }
 
@@ -156,6 +206,8 @@ public class SocketStompService {
         debuggingService.stompDebug("@Stomp Database backup requested by session: " + stompID);
         BackupClient bk1 = new BackupClient();
         BackupClient bk2 = new BackupClient();
+        BackupClient bk3 = new BackupClient();
+        BackupClient bk4 = new BackupClient();
         debuggingService.socketDebug("Connecting to socket server at address 192.168.1.175 port 4431");
         bk1.startConnection("192.168.1.177", 4431);
         debuggingService.socketDebug("Connected to socket server at address 192.168.1.175 port 4431");
@@ -165,14 +217,14 @@ public class SocketStompService {
         this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Generating table checksum", createHeaders(stompID));
         List<String> tables = tableManagerService.getTableNames();
         boolean hashb = true;
-        if(tables.contains(table)){
+        if (tables.contains(table)) {
             String hash = "h;" + table;
             Future<String> fut1 = threadPoolTaskExecutor.submit(new MsgThread(hash, bk1));
             String res = fut1.get();
             if (res.equals("null")) {
                 this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table checksums", createHeaders(stompID));
                 hashb = false;
-            }else{
+            } else {
                 this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Generating table backup", createHeaders(stompID));
                 hash = "bk;" + table;
                 fut1 = threadPoolTaskExecutor.submit(new MsgThread(hash, bk1));
@@ -180,7 +232,7 @@ public class SocketStompService {
                 if (res.equals("null")) {
                     this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table backup", createHeaders(stompID));
                     hashb = false;
-                }else {
+                } else {
                     this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Backup finished successfully", createHeaders(stompID));
                 }
             }

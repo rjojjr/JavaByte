@@ -44,9 +44,10 @@ class SelectAdvanced implements Callable<Transaction> {
                 }
             } else {
                 try {
-                    transaction.setResults(tableManagerService.searchTable(tableNames.get(0), transaction.getWhere(), transaction.getHowMany().intValue()));
+                    transaction.setResults(tableManagerService.searchTable(tableNames.get(0), transaction.getWhere(), Integer.parseInt(transaction.getHowMany().toString())));
                     return transaction;
                 } catch (Exception e) {
+                    e.printStackTrace();
                     transaction.setSuccessfull(false);
                     transaction.setFinishTime(System.currentTimeMillis());
                     transaction.setFailMessage(new String(e.getMessage()));
