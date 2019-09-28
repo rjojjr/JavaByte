@@ -104,15 +104,16 @@ class IndependentClientHandler implements Runnable {
                 //debuggingService.socketDebug("Input: " + inputLine);
                 //System.out.println("here");
                 if(!key){
-                    if(keys.getPublicKey(new String(Base64.getDecoder().decode(inputLine), "UTF-8"))){
+                    if(keys.getPublicKey(Base64.getDecoder().decode(inputLine))){
                         key = true;
-                        String keyOut;
-                        if((keyOut = keys.encryptAESKey()) == null){
+                        byte[] keyOut;
+                        if((keyOut = keys.encryptAESKey()).length == 0){
                             debuggingService.socketDebug("Failed to get generate AES key for client " + ip + " on port " + port + "\r\nConnection closed.");
                             debuggingService.nonFatalDebug("Failed to get generate AES key for client " + ip + " on port " + port + "\r\nConnection closed.");
                             break;
                         }
-                        out.write(new String(Base64.getEncoder().encode(keyOut.getBytes("UTF-8"))) + "\n");
+                        debuggingService.socketDebug("Sent AES key to client " + ip + " on port " + port);
+                        out.write(new String(Base64.getEncoder().encode(keyOut)) + "\n");
                         out.flush();
                     }else{
                         debuggingService.socketDebug("Failed to get public key from client " + ip + " on port " + port + "\r\nConnection closed.");

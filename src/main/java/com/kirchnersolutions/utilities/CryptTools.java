@@ -1,6 +1,6 @@
 package com.kirchnersolutions.utilities;
 
-import java.io.File;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -10,6 +10,7 @@ import java.security.PublicKey;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
@@ -38,7 +39,8 @@ public class CryptTools {
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
-
+        System.out.println("Public key format: " + publicKey.getFormat());
+        System.out.println("Private key format: " + privateKey.getFormat());
         Map<String, Object> keys = new HashMap<String, Object>();
         keys.put("private", privateKey);
         keys.put("public", publicKey);
@@ -50,6 +52,7 @@ public class CryptTools {
         return keyBytes;
     }
 
+    /*
     public static String serializePubKey(PublicKey pubKey) {
         RSAPublicKey publicKey = (RSAPublicKey) (pubKey);
         return publicKey.getModulus().toString() + "|"
@@ -57,7 +60,7 @@ public class CryptTools {
     }
 
     public static PublicKey deserializePubKey(String serial) {
-        String[] Parts = serial.split("\\|");
+        String[] Parts = serial.split("|");
         RSAPublicKeySpec Spec = new RSAPublicKeySpec(
                 new BigInteger(Parts[0]),
                 new BigInteger(Parts[1]));
@@ -69,10 +72,12 @@ public class CryptTools {
 
     }
 
+     */
+
     public static String decryptRSAMsg(String encryptedText, PrivateKey privateKey) throws Exception {
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS5Padding");
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        return new String(cipher.doFinal(java.util.Base64.getDecoder().decode(encryptedText)));
+        return new String(cipher.doFinal(encryptedText.getBytes("UTF-8")));
     }
 
     /*
@@ -92,16 +97,16 @@ public class CryptTools {
 
      */
 
-    public static String encryptRSAMsg(String plainText, PublicKey publicKey) throws Exception {
+    public static byte[] encryptRSAMsg(byte[] plainText, PublicKey publicKey) throws Exception {
         /*
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         return new String(Base64.getEncoder().encode(cipher.doFinal(java.util.Base64.getDecoder().decode(plainText))), "UTF-8");
 
          */
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS5Padding");
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        return new java.lang.String(cipher.doFinal(plainText.getBytes("UTF-8")), "UTF-8");
+        return cipher.doFinal(plainText);
     }
 
     private static byte[] processRSAList(List<byte[]> input, boolean encrypt) {
@@ -304,5 +309,124 @@ public class CryptTools {
             bytes[i] = (byte) random.nextInt(125);
         }
         return bytes;
+    }
+
+    public static byte[] serializePubKey(PublicKey object) throws Exception{
+        PublicKey key = (PublicKey)object;
+        return key.getEncoded();
+        /*
+        if(object != null){
+            byte[] bytes = null;
+            try {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ObjectOutputStream out = null;
+                out = new ObjectOutputStream(bos);
+                out.writeObject(object);
+                out.close();
+                bos.close();
+                bytes = bos.toByteArray();
+            } catch (Exception e) {
+            }
+            return bytes;
+        }else{
+            return null;
+        }
+
+         */
+    }
+
+    public static PublicKey deserializePubKey(byte[] bytes) throws Exception{
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePublic(new X509EncodedKeySpec(bytes));
+        /*
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        ObjectInputStream in = null;
+        PublicKey o = null;
+        try {
+            in = new ObjectInputStream(bis);
+            o = (PublicKey)in.readObject();
+            in.close();
+            bis.close();;
+        } catch (Exception e) {
+        }
+        return o;
+
+         */
+    }
+
+    public static byte[] serializePivKey(PrivateKey object) throws Exception{
+        PrivateKey key = (PrivateKey)object;
+        return key.getEncoded();
+        /*
+        if(object != null){
+            byte[] bytes = null;
+            try {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ObjectOutputStream out = null;
+                out = new ObjectOutputStream(bos);
+                out.writeObject(object);
+                out.close();
+                bos.close();
+                bytes = bos.toByteArray();
+            } catch (Exception e) {
+            }
+            return bytes;
+        }else{
+            return null;
+        }
+
+         */
+    }
+
+    public static PrivateKey deserializePrivKey(byte[] bytes) throws Exception{
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePrivate(new PKCS8EncodedKeySpec(bytes));
+        /*
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        ObjectInputStream in = null;
+        PrivateKey o = null;
+        try {
+            in = new ObjectInputStream(bis);
+            o = (PrivateKey)in.readObject();
+            in.close();
+            bis.close();;
+        } catch (Exception e) {
+        }
+        return o;
+
+         */
+    }
+
+    static byte[] serializeKeystore(Object object) throws Exception{
+        if(object != null){
+            byte[] bytes = null;
+            try {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ObjectOutputStream out = null;
+                out = new ObjectOutputStream(bos);
+                out.writeObject(object);
+                out.close();
+                bos.close();
+                bytes = bos.toByteArray();
+            } catch (Exception e) {
+            }
+            return bytes;
+        }else{
+            return null;
+        }
+    }
+
+    static Map<String, Object> deserializeKeystore(byte[] bytes) throws Exception{
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        ObjectInputStream in = null;
+        Map<String, Object> o = null;
+        try {
+            in = new ObjectInputStream(bis);
+            o = (Map<String, Object>)in.readObject();
+            in.close();
+            bis.close();;
+        } catch (Exception e) {
+        }
+        return o;
     }
 }

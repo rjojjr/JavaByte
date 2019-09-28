@@ -18,7 +18,7 @@ public class Keys {
         RSAKeys = CryptTools.getRSAKeys();
     }
 
-    boolean getPublicKey(String key){
+    boolean getPublicKey(byte[] key) throws Exception{
         publicKey = CryptTools.deserializePubKey(key);
         if(publicKey == null){
             return false;
@@ -26,13 +26,13 @@ public class Keys {
         return true;
     }
 
-    String encryptAESKey() {
+    byte[] encryptAESKey() {
         if (publicKey == null) {
-            return null;
+            return new byte[0];
         }
         try{
             secretKey = CryptTools.generateRandomSecretKey();
-            return CryptTools.encryptRSAMsg(new String(CryptTools.serializeAESKey(secretKey), "UTF-8"), publicKey);
+            return CryptTools.encryptRSAMsg(CryptTools.serializeAESKey(secretKey), publicKey);
         }catch (Exception e){
             e.printStackTrace();
             return null;

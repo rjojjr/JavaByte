@@ -131,7 +131,7 @@ class SocketServer implements Runnable{
 
     String processInput(String input, Session session) throws Exception{
         try{
-            return new String(transactionService.submitTransaction((Transaction)databaseObjectFactory.databaseObjectFactory(Base64.getDecoder().decode(input.getBytes("UTF-8"))), session), "UTF-8");
+            return new String(transactionService.submitTransaction((Transaction)databaseObjectFactory.databaseObjectFactory(input.getBytes("UTF-8")), session), "UTF-8");
         }catch (Exception e){
             debuggingService.socketDebug("Failed to parse socket input on port " + port);
             debuggingService.throwDevException(new DevelopmentException("Failed to parse socket input on port " + port + " " + e.getStackTrace().toString()));

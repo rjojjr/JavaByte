@@ -9,6 +9,7 @@ package com.kirchnersolutions.database.Configuration;
 import com.kirchnersolutions.database.exceptions.ConfigurationException;
 import com.kirchnersolutions.database.exceptions.DevelopmentException;
 import com.kirchnersolutions.utilities.ByteTools;
+import com.kirchnersolutions.utilities.CryptTools;
 import com.kirchnersolutions.utilities.SerialService.ConfigSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
@@ -17,10 +18,15 @@ import com.kirchnersolutions.license.api.Manager;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Map;
 
 @DependsOn({"devVars", "sysVars", "tableConfiguration", "socketServerConfiguration", "deviceConfiguration"})
 @Service
 public class ConfigurationService {
+
+    public static final boolean DISTRIBUTION_COPY = false;
 
     @Autowired
     private DevVars devVars;
@@ -50,8 +56,10 @@ public class ConfigurationService {
         tableConfig = new File(configDir, "/TableConfig.dbs");
         socketConfig = new File(configDir, "/SocketServerConfig.dbs");
         deviceConfig = new File(configDir, "/DeviceConfig.dbs");
-        licenseManager = Manager.init(new File("Database/KSLS"));
-        licenseManager.initLicense();
+        if(DISTRIBUTION_COPY){
+            licenseManager = Manager.init(new File("Database/KSLS"));
+            licenseManager.initLicense();
+        }
         if(!configDir.exists()){
             configDir.mkdirs();
             try{

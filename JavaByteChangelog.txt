@@ -6,10 +6,10 @@ JavaByte Modern Database Changelog
 1.0.20a
 #########################################################################
 Build 21112
-    Started license impl.
+    Implemented licenses
 
 Build 21111
-    Started socket connection encryption impl.
+    Implemented socket encryption.
 
 ########################################################################
 
