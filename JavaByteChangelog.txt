@@ -5,6 +5,9 @@ JavaByte Modern Database Changelog
 09/24/2019
 1.0.20a
 #########################################################################
+Build 21112
+    Started license impl.
+
 Build 21111
     Started socket connection encryption impl.
 

@@ -13,6 +13,7 @@ import com.kirchnersolutions.utilities.SerialService.ConfigSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
+import com.kirchnersolutions.license.api.Manager;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -32,6 +33,7 @@ public class ConfigurationService {
     @Autowired
     private DeviceConfiguration deviceConfiguration;
 
+    private Manager licenseManager;
     private ConfigSerializer configSerializer = new ConfigSerializer();
     private File configDir, devConfig, sysConfig, tableConfig, socketConfig, deviceConfig;
 
@@ -48,6 +50,8 @@ public class ConfigurationService {
         tableConfig = new File(configDir, "/TableConfig.dbs");
         socketConfig = new File(configDir, "/SocketServerConfig.dbs");
         deviceConfig = new File(configDir, "/DeviceConfig.dbs");
+        licenseManager = Manager.init(new File("Database/KSLS"));
+        licenseManager.initLicense();
         if(!configDir.exists()){
             configDir.mkdirs();
             try{
