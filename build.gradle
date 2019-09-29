@@ -36,7 +36,8 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: "io.freefair.lombok"
 
 group = 'com.kirchnersolutions'
-version = '1.0.20a'
+version = '1.0.00b'
+def build = '21200'
 sourceCompatibility = '1.8'
 
 if (!hasProperty('mainClass')) {

@@ -73,8 +73,49 @@ public class SocketStompService {
         }
     }
 
-    void backUpTables(String stompID) throws Exception {
+    boolean backUpTables(String stompID) throws Exception {
         debuggingService.stompDebug("@Stomp Database backup requested by session: " + stompID);
+        BackupClient bk1 = new BackupClient();
+        debuggingService.socketDebug("Connecting to backup service at localHost port 4434");
+        bk1.startConnection("127.0.0.1", 4434);
+        this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Generating table checksums", createHeaders(stompID));
+        List<String> tables = tableManagerService.getTableNames();
+        boolean hashb = true;
+        Future<String>[] futures = new Future[tables.size()];
+        for (int i = 0; i < tables.size(); i++) {
+            String hash = "h;" + tables.get(i);
+            futures[i] = threadPoolTaskExecutor.submit(new MsgThread(hash, bk1));
+        }
+        for (int i = 0; i < tables.size(); i++) {
+            if(futures[i].get() == null){
+                hashb = false;
+                break;
+            }
+        }
+        if(!hashb){
+            this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table checksums", createHeaders(stompID));
+            return false;
+        }
+        this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Done generating table checksums", createHeaders(stompID));
+        this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Generating table backups", createHeaders(stompID));
+        for (int i = 0; i < tables.size(); i++) {
+            String hash = "h;" + tables.get(i);
+            futures[i] = threadPoolTaskExecutor.submit(new MsgThread("bk;" + tables.get(i), bk1));
+        }
+        for (int i = 0; i < tables.size(); i++) {
+            if(futures[i].get() == null){
+                hashb = false;
+                break;
+            }
+        }
+        if(!hashb){
+            this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Failed to generate table backups", createHeaders(stompID));
+            return false;
+        }
+        this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Finished generating table backups", createHeaders(stompID));
+        this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Backup complete", createHeaders(stompID));
+        return true;
+        /*
         BackupClient bk1 = new BackupClient();
         BackupClient bk2 = new BackupClient();
         BackupClient bk3 = new BackupClient();
@@ -200,6 +241,8 @@ public class SocketStompService {
                 this.simpMessagingTemplate.convertAndSendToUser(stompID, "/queue/notify", "status%Backup finished successfully", createHeaders(stompID));
             }
         }
+
+         */
     }
 
     void backUpTable(String stompID, String table) throws Exception {

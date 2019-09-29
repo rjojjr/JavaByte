@@ -17,7 +17,7 @@ public class DocumentService {
     @Autowired
     private DebuggingService debuggingService;
 
-    private final File changeLog = new File("Database//Doc//JavaByteChangelog.txt");
+    private final File changeLog = new File("Database//Doc//Changelog.txt");
     private final File doc = new File("Database//Doc//JavaByte_Documentation.txt");
 
     String getChangelog() throws Exception{

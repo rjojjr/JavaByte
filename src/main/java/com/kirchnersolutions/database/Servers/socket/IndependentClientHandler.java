@@ -100,7 +100,6 @@ class IndependentClientHandler implements Runnable {
         try {
             while ((inputLine = in.readLine()) != null) {
                 //debuggingService.socketDebug("Input: " + inputLine);
-                //System.out.println("here");
                 if(!key){
                     if(keys.getPublicKey(Base64.getDecoder().decode(inputLine))){
                         key = true;
