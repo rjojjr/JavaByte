@@ -39,7 +39,7 @@ public class Keys {
         }
     }
 
-    byte[] decryptAESResponse(byte[] response) throws Exception{
+    byte[] decryptAESResponse(String response) throws Exception{
         if(secretKey == null){
             return null;
         }

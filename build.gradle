@@ -81,7 +81,7 @@ dependencies {
 	//compile name: 'slf4j-simple-1.7.26'
 	compile("net.java.dev.jna:jna:5.3.1")
 	compile("net.java.dev.jna:jna-platform:5.3.1")
-	compile name: 'LicenseAPI-1.0.00a'
+	compile name: 'LicenseAPI-1.0.01a'
 	//compile("io.freefair.gradle:lombok-plugin:3.6.6")
 }
 

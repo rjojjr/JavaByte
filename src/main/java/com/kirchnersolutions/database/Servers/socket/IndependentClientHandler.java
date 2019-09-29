@@ -40,8 +40,6 @@ class IndependentClientHandler implements Runnable {
 
     private SocketServer socketServer;
 
-    private Keys keys;
-
     private volatile boolean loggedOn = false;
     private String userName = "";
 
@@ -54,7 +52,6 @@ class IndependentClientHandler implements Runnable {
         this.debuggingService = debuggingService;
         //System.out.println("here");
         stop = false;
-        keys = new Keys();
     }
 
     public String getUserName() {
@@ -71,6 +68,7 @@ class IndependentClientHandler implements Runnable {
 
     @Override
     public void run() {
+        Keys keys = new Keys();
         String ip = clientSocket.getRemoteSocketAddress().toString().split("/")[1];
         int port = clientSocket.getPort();
         Thread.currentThread().setName("SocketSession port " + port + " address " + ip);
@@ -113,7 +111,7 @@ class IndependentClientHandler implements Runnable {
                             break;
                         }
                         debuggingService.socketDebug("Sent AES key to client " + ip + " on port " + port);
-                        out.write(new String(Base64.getEncoder().encode(keyOut)) + "\n");
+                        out.write(Base64.getEncoder().encodeToString(keyOut) + "\n");
                         out.flush();
                     }else{
                         debuggingService.socketDebug("Failed to get public key from client " + ip + " on port " + port + "\r\nConnection closed.");
@@ -127,15 +125,15 @@ class IndependentClientHandler implements Runnable {
                     } else {
                         debuggingService.socketDebug("Socket request received from null " + "on port " + port + " address " + ip);
                     }
-                    String output = socketServer.processInput(new String(keys.decryptAESResponse(inputLine.getBytes("UTF-8")), "UTF-8"), session);
-                    output = new String(keys.encryptAESRequest(output.getBytes("UTF-8")), "UTF-8");
+                    byte[] output = socketServer.processInput(keys.decryptAESResponse(inputLine), session);
+                    output = keys.encryptAESRequest(output);
                     if (session == null) {
                         out.write("-close\n");
                         out.flush();
                         break;
                     } else {
-                        output = new String(Base64.getEncoder().encode(output.getBytes("UTF-8")), "UTF-8");
-                        out.write(output + "\n");
+                        //debuggingService.socketDebug("Output: " + Base64.getEncoder().encodeToString(output));
+                        out.write(Base64.getEncoder().encodeToString(output) + "\n");
                         dev.setUsername(session.getUser().getDetail("username"));
                         out.flush();
                         debuggingService.socketDebug("Socket request received from " + dev.getUsername() + " processed successfully on port " + port + " address " + ip);

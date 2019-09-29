@@ -15,9 +15,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -39,8 +37,8 @@ public class CryptTools {
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
-        System.out.println("Public key format: " + publicKey.getFormat());
-        System.out.println("Private key format: " + privateKey.getFormat());
+        //System.out.println("Public key format: " + publicKey.getFormat());
+        //System.out.println("Private key format: " + privateKey.getFormat());
         Map<String, Object> keys = new HashMap<String, Object>();
         keys.put("private", privateKey);
         keys.put("public", publicKey);
@@ -164,6 +162,16 @@ public class CryptTools {
     public static byte[] aesDecrypt(SecretKey key, byte[] input) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(generateIV(key)));
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        CipherInputStream in = new CipherInputStream(new ByteArrayInputStream(input), cipher);
+        byte[] b = new byte[100];
+        int read;
+        while ((read = in.read(b)) >= 0) {
+            buffer.write(b, 0, read);
+        }
+        in.close();
+        return buffer.toByteArray();
+        /*
         if (input.length < 16) {
             return cipher.doFinal(input);
         }
@@ -180,11 +188,21 @@ public class CryptTools {
             }
         }
         return processList(output, false);
+
+         */
     }
 
     public static byte[] aesEncrypt(SecretKey key, byte[] input) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(generateIV(key)));
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        CipherOutputStream out = new CipherOutputStream(buffer, cipher);
+        out.write(input);
+        out.flush();
+        out.close();
+        return buffer.toByteArray();
         //byte[] iv = generateRandomBytes(16);
+        /*
         cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(generateIV(key)));
         if (input.length < 16) {
             return cipher.doFinal(input);
@@ -203,6 +221,8 @@ public class CryptTools {
             }
         }
         return processList(output, true);
+
+         */
     }
 
     private static byte[] processList(List<byte[]> input, boolean encrypt) {
@@ -243,7 +263,11 @@ public class CryptTools {
         }
     }
 
-    public static SecretKey generateRandomSecretKey() {
+    public static SecretKey generateRandomSecretKey() throws Exception{
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        keyGen.init(128); // for example
+        return keyGen.generateKey();
+        /*
         try {
             byte[] password = generateRandomBytes(1024 * 1024);
             final MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -252,6 +276,8 @@ public class CryptTools {
         } catch (Exception e) {
             return null;
         }
+
+         */
     }
 
     public static byte[] serializeAESKey(SecretKey key) {
@@ -269,7 +295,7 @@ public class CryptTools {
     }
 
     public static SecretKey deserializeAESKey(byte[] bytes) {
-        SecretKey key = new SecretKeySpec(bytes, "AES");
+        SecretKey key = new SecretKeySpec(bytes, 0, bytes.length, "AES");
         return key;
     }
 
